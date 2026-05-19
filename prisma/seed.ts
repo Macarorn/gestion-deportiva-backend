@@ -8,18 +8,27 @@ const defaultPassword = "Password123!";
 
 const seedUsers = [
   {
-    nombre: "Carlos Instructor",
+    nombre: "Carlos",
+    apellido: "Instructor",
+    numero_documento: "123456789",
     correo: "instructor@demo.com",
+    telefono: "+573001234567",
     tipo_usuario: TipoUsuario.Instructor,
   },
   {
-    nombre: "Ana Administradora",
+    nombre: "Ana",
+    apellido: "Administradora",
+    numero_documento: "987654321",
     correo: "admin@demo.com",
+    telefono: "+573007654321",
     tipo_usuario: TipoUsuario.Administrador,
   },
   {
-    nombre: "Luis Almacenista",
+    nombre: "Luis",
+    apellido: "Almacenista",
+    numero_documento: "456123789",
     correo: "almacen@demo.com",
+    telefono: "+573009876543",
     tipo_usuario: TipoUsuario.Almacenista,
   },
 ];
@@ -32,13 +41,19 @@ const run = async () => {
       where: { correo: user.correo },
       update: {
         nombre: user.nombre,
+        apellido: user.apellido,
+        numero_documento: user.numero_documento,
+        telefono: user.telefono,
         contrasena: hashed,
         tipo_usuario: user.tipo_usuario,
         estado: true,
       },
       create: {
         nombre: user.nombre,
+        apellido: user.apellido,
+        numero_documento: user.numero_documento,
         correo: user.correo,
+        telefono: user.telefono,
         contrasena: hashed,
         tipo_usuario: user.tipo_usuario,
         estado: true,

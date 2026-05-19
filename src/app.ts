@@ -4,6 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 
 import authRoutes from "./routes/auth.routes";
+import usuariosRoutes from "./routes/usuarios.routes";
 
 const app = express();
 
@@ -19,5 +20,6 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/usuarios", usuariosRoutes);
 
 export default app;

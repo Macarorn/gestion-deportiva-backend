@@ -16,15 +16,22 @@ enum TipoUsuario {
   Instructor
   Administrador
   Almacenista
+  Aprendiz
+  Externo
 }
 
 model Usuario {
-  id           Int         @id @default(autoincrement())
-  nombre       String
-  correo       String      @unique
-  contrasena   String
-  tipo_usuario TipoUsuario
-  estado       Boolean     @default(true)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id               Int         @id @default(autoincrement())
+  nombre           String
+  apellido         String
+  numero_documento String      @unique
+  correo           String      @unique
+  contrasena       String
+  telefono         String
+  tipo_usuario     TipoUsuario
+  estado           Boolean     @default(true)
+  ficha            String?
+  observaciones    String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 }
