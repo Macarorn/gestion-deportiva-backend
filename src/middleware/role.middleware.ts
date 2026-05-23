@@ -16,3 +16,6 @@ export const requireRole = (rolesPermitidos: TipoUsuario[]) => {
     return next();
   };
 };
+
+// Alias para compatibilidad
+export const authorize = requireRole;

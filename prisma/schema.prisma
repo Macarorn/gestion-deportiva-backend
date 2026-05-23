@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -34,4 +29,61 @@ model Usuario {
   observaciones    String?
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
+}
+
+model Categoria {
+  id            Int            @id @default(autoincrement())
+  nombre        String         @unique
+  descripcion   String?
+  estado        Boolean        @default(true)
+  subCategorias SubCategoria[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model SubCategoria {
+  id          Int        @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  categoria   Categoria  @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+  categoriaId Int
+  estado      Boolean    @default(true)
+  materiales  Material[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([categoriaId, nombre])
+}
+
+model Material {
+  id                     Int          @id @default(autoincrement())
+  nombre                 String
+  descripcion            String?
+  subCategoria           SubCategoria @relation(fields: [subCategoriaId], references: [id], onDelete: Restrict)
+  subCategoriaId         Int
+  cantidad_total         Int          @default(0)
+  cantidad_disponible    Int          @default(0)
+  cantidad_prestada      Int          @default(0)
+  cantidad_danada        Int          @default(0)
+  cantidad_mantenimiento Int          @default(0)
+  requiere_serial        Boolean      @default(false)
+  estado                 String       @default("activo")
+  fotografia             String?
+  observaciones          String?
+  elementos              Elemento[]
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+}
+
+model Elemento {
+  id            Int      @id @default(autoincrement())
+  material      Material @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  materialId    Int
+  nombre_serial String
+  estado        String   @default("disponible")
+  observaciones String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([materialId, nombre_serial])
 }

@@ -25,3 +25,6 @@ export const requireAuth = (
     return res.status(401).json({ message: "Token invalido o expirado" });
   }
 };
+
+// Alias para compatibilidad
+export const authenticate = requireAuth;

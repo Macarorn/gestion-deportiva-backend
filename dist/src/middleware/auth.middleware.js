@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.requireAuth = void 0;
+exports.authenticate = exports.requireAuth = void 0;
 const jwt_1 = require("../utils/jwt");
 const requireAuth = (req, res, next) => {
     const header = req.headers.authorization;
@@ -22,3 +22,5 @@ const requireAuth = (req, res, next) => {
     }
 };
 exports.requireAuth = requireAuth;
+// Alias para compatibilidad
+exports.authenticate = exports.requireAuth;
