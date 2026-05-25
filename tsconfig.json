@@ -10,9 +10,17 @@
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node", "express"],
-    "ignoreDeprecations": "6.0"
+    "types": [
+      "node",
+      "express"
+    ]
   },
-  "include": ["src", "prisma/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src",
+    "prisma/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

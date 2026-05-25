@@ -12,7 +12,7 @@ const seedUsers = [
     apellido: "Instructor",
     numero_documento: "123456789",
     correo: "instructor@demo.com",
-    telefono: "+573001234567",
+    telefono: "3001234567",
     tipo_usuario: TipoUsuario.Instructor,
   },
   {
@@ -20,7 +20,7 @@ const seedUsers = [
     apellido: "Administradora",
     numero_documento: "987654321",
     correo: "admin@demo.com",
-    telefono: "+573007654321",
+    telefono: "3007654321",
     tipo_usuario: TipoUsuario.Administrador,
   },
   {
@@ -28,7 +28,7 @@ const seedUsers = [
     apellido: "Almacenista",
     numero_documento: "456123789",
     correo: "almacen@demo.com",
-    telefono: "+573009876543",
+    telefono: "3009876543",
     tipo_usuario: TipoUsuario.Almacenista,
   },
 ];
@@ -175,8 +175,8 @@ const run = async () => {
       descripcion: "Balón profesional para fútbol",
       subCategoriaId: sub1.id,
       cantidad_total: 10,
-      cantidad_disponible: 8,
-      cantidad_prestada: 2,
+      cantidad_disponible: 10,
+      cantidad_prestada: 0,
       requiere_serial: true,
       estado: "activo",
       fotografia: "balon_futbol.jpg",
@@ -190,8 +190,8 @@ const run = async () => {
       descripcion: "Balón oficial de baloncesto",
       subCategoriaId: sub2.id,
       cantidad_total: 6,
-      cantidad_disponible: 4,
-      cantidad_prestada: 2,
+      cantidad_disponible: 6,
+      cantidad_prestada: 0,
       requiere_serial: false,
       estado: "activo",
       fotografia: "balon_basket.jpg",
@@ -205,8 +205,8 @@ const run = async () => {
       descripcion: "Balón oficial de voleibol",
       subCategoriaId: sub3.id,
       cantidad_total: 8,
-      cantidad_disponible: 7,
-      cantidad_prestada: 1,
+      cantidad_disponible: 8,
+      cantidad_prestada: 0,
       requiere_serial: false,
       estado: "activo",
       fotografia: "balon_voleibol.jpg",
@@ -220,8 +220,8 @@ const run = async () => {
       descripcion: "Peto de entrenamiento color rojo",
       subCategoriaId: sub4.id,
       cantidad_total: 20,
-      cantidad_disponible: 15,
-      cantidad_prestada: 5,
+      cantidad_disponible: 20,
+      cantidad_prestada: 0,
       requiere_serial: true,
       estado: "activo",
       fotografia: "peto_rojo.jpg",
@@ -235,8 +235,8 @@ const run = async () => {
       descripcion: "Peto de entrenamiento color azul",
       subCategoriaId: sub4.id,
       cantidad_total: 20,
-      cantidad_disponible: 18,
-      cantidad_prestada: 2,
+      cantidad_disponible: 20,
+      cantidad_prestada: 0,
       requiere_serial: false,
       estado: "activo",
       fotografia: "peto_azul.jpg",
@@ -250,8 +250,8 @@ const run = async () => {
       descripcion: "Peto de competencia color amarillo",
       subCategoriaId: sub5.id,
       cantidad_total: 15,
-      cantidad_disponible: 14,
-      cantidad_prestada: 1,
+      cantidad_disponible: 15,
+      cantidad_prestada: 0,
       requiere_serial: false,
       estado: "activo",
       fotografia: "peto_amarillo.jpg",
@@ -265,8 +265,8 @@ const run = async () => {
       descripcion: "Cono de señalización estándar",
       subCategoriaId: sub6.id,
       cantidad_total: 30,
-      cantidad_disponible: 25,
-      cantidad_prestada: 5,
+      cantidad_disponible: 30,
+      cantidad_prestada: 0,
       requiere_serial: false,
       estado: "activo",
       fotografia: "cono_naranja.jpg",
@@ -280,8 +280,8 @@ const run = async () => {
       descripcion: "Red para cancha de voleibol/badminton",
       subCategoriaId: sub7.id,
       cantidad_total: 4,
-      cantidad_disponible: 3,
-      cantidad_prestada: 1,
+      cantidad_disponible: 4,
+      cantidad_prestada: 0,
       requiere_serial: true,
       estado: "activo",
       fotografia: "red_deportiva.jpg",
@@ -292,85 +292,15 @@ const run = async () => {
   console.log("Creando elementos (seriales opcionales)...");
 
   // Elementos para Balón de fútbol (requiere_serial: true, cantidad_total: 10)
-  await prisma.elemento.create({
-    data: {
-      materialId: material1.id,
-      nombre_serial: "Balón Fútbol #001",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material1.id,
-      nombre_serial: "Balón Fútbol #002",
-      estado: "prestado",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material1.id,
-      nombre_serial: "Balón Fútbol #003",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material1.id,
-      nombre_serial: "Balón Fútbol #004",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material1.id,
-      nombre_serial: "Balón Fútbol #005",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material1.id,
-      nombre_serial: "Balón Fútbol #006",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material1.id,
-      nombre_serial: "Balón Fútbol #007",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material1.id,
-      nombre_serial: "Balón Fútbol #008",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material1.id,
-      nombre_serial: "Balón Fútbol #009",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material1.id,
-      nombre_serial: "Balón Fútbol #010",
-      estado: "prestado",
-    },
-  });
+  for (let i = 1; i <= 10; i++) {
+    await prisma.elemento.create({
+      data: {
+        materialId: material1.id,
+        nombre_serial: `Balón Fútbol #${i.toString().padStart(3, '0')}`,
+        estado: "disponible",
+      },
+    });
+  }
 
   // Elementos para Peto rojo (requiere_serial: true, cantidad_total: 20)
   for (let i = 1; i <= 20; i++) {
@@ -378,43 +308,21 @@ const run = async () => {
       data: {
         materialId: material4.id,
         nombre_serial: `Peto Rojo #${i.toString().padStart(3, '0')}`,
-        estado: i <= 15 ? "disponible" : "prestado",
+        estado: "disponible",
       },
     });
   }
 
   // Elementos para Red deportiva (requiere_serial: true, cantidad_total: 4)
-  await prisma.elemento.create({
-    data: {
-      materialId: material8.id,
-      nombre_serial: "Red Deportiva #001",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material8.id,
-      nombre_serial: "Red Deportiva #002",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material8.id,
-      nombre_serial: "Red Deportiva #003",
-      estado: "disponible",
-    },
-  });
-
-  await prisma.elemento.create({
-    data: {
-      materialId: material8.id,
-      nombre_serial: "Red Deportiva #004",
-      estado: "prestado",
-    },
-  });
+  for (let i = 1; i <= 4; i++) {
+    await prisma.elemento.create({
+      data: {
+        materialId: material8.id,
+        nombre_serial: `Red Deportiva #${i.toString().padStart(3, '0')}`,
+        estado: "disponible",
+      },
+    });
+  }
 
   console.log("✅ Seed data creado exitosamente");
 };

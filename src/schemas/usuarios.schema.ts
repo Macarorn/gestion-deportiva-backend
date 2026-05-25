@@ -8,7 +8,7 @@ const passwordRegex =
 const nameRegex = /^[a-záéíóúñA-ZÁÉÍÓÚÑ\s]+$/;
 
 // Regex para validar teléfono colombiano
-const phoneRegex = /^\+57\s?\d{10}$/;
+const phoneRegex = /^\d{10}$/;
 
 export const createUsuarioSchema = z
   .object({
@@ -34,7 +34,7 @@ export const createUsuarioSchema = z
       .string()
       .regex(
         phoneRegex,
-        "El teléfono debe tener formato +57 XXXXXXXXXX (10 dígitos)",
+        "El teléfono debe tener 10 dígitos",
       ),
 
     tipo_usuario: z.enum([
@@ -114,7 +114,7 @@ export const updateUsuarioSchema = z.object({
     .string()
     .regex(
       phoneRegex,
-      "El teléfono debe tener formato +57 XXXXXXXXXX (10 dígitos)",
+      "El teléfono debe tener 10 dígitos",
     )
     .optional(),
 
