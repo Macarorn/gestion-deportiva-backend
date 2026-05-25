@@ -9,6 +9,7 @@ import {
 
 /**
  * Función auxiliar para recalcular las cantidades de un material basado en sus elementos
+ * Retorna el material actualizado con sus elementos
  */
 async function recalcularCantidadesMaterial(materialId: number) {
   const elementos = await prisma.elemento.findMany({
@@ -32,7 +33,7 @@ async function recalcularCantidadesMaterial(materialId: number) {
     cantidad_mantenimiento,
   });
 
-  await prisma.material.update({
+  const materialActualizado = await prisma.material.update({
     where: { id: materialId },
     data: {
       cantidad_total,
@@ -41,9 +42,18 @@ async function recalcularCantidadesMaterial(materialId: number) {
       cantidad_danada,
       cantidad_mantenimiento,
     },
+    include: {
+      elementos: true,
+      subCategoria: {
+        include: {
+          categoria: true,
+        },
+      },
+    },
   });
 
   console.log(`[recalcularCantidadesMaterial] Material actualizado`);
+  return materialActualizado;
 }
 
 /**
@@ -265,27 +275,17 @@ export const createElemento = async (
       return;
     }
 
-    const elemento = await prisma.elemento.create({
+    // Crear elemento
+    await prisma.elemento.create({
       data,
-      include: {
-        material: {
-          include: {
-            subCategoria: {
-              include: {
-                categoria: true,
-              },
-            },
-          },
-        },
-      },
     });
 
-    // Recalcular cantidades del material padre
-    await recalcularCantidadesMaterial(data.materialId);
+    // Recalcular cantidades del material padre y obtener material actualizado
+    const materialActualizado = await recalcularCantidadesMaterial(data.materialId);
 
     res.status(201).json({
       success: true,
-      data: elemento,
+      data: materialActualizado,
       message: "Elemento creado exitosamente",
     });
   } catch (error) {
@@ -354,28 +354,23 @@ export const updateElemento = async (
       }
     }
 
-    const elemento = await prisma.elemento.update({
+    // Actualizar elemento
+    await prisma.elemento.update({
       where: { id },
       data,
-      include: {
-        material: {
-          include: {
-            subCategoria: {
-              include: {
-                categoria: true,
-              },
-            },
-          },
-        },
-      },
     });
 
-    // Recalcular cantidades del material padre
-    await recalcularCantidadesMaterial(existingElemento.materialId);
+    // Recalcular cantidades del material original
+    const materialActualizado = await recalcularCantidadesMaterial(existingElemento.materialId);
+
+    // Si se cambió el materialId, recalcular también el nuevo material
+    if (data.materialId && data.materialId !== existingElemento.materialId) {
+      await recalcularCantidadesMaterial(data.materialId);
+    }
 
     res.status(200).json({
       success: true,
-      data: elemento,
+      data: materialActualizado,
       message: "Elemento actualizado exitosamente",
     });
   } catch (error) {
@@ -443,11 +438,12 @@ export const deleteElemento = async (
       where: { id },
     });
 
-    // Recalcular cantidades del material padre
-    await recalcularCantidadesMaterial(existingElemento.materialId);
+    // Recalcular cantidades del material padre y obtener material actualizado
+    const materialActualizado = await recalcularCantidadesMaterial(existingElemento.materialId);
 
     res.status(200).json({
       success: true,
+      data: materialActualizado,
       message: "Elemento eliminado exitosamente",
     });
   } catch (error) {

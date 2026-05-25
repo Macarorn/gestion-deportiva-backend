@@ -20,22 +20,23 @@ const router = Router();
 router.get("/", authenticate, getAllElementos);
 
 /**
- * GET /api/elementos/:id
- * Obtener un elemento por ID
- */
-router.get("/:id", authenticate, getElementoById);
-
-/**
- * GET /api/materiales/:materialId/elementos
+ * GET /api/elementos/material/:materialId
  * Obtener elementos de un material específico
  */
 router.get("/material/:materialId", authenticate, getElementosByMaterial);
 
 /**
  * GET /api/elementos/estado/:estado
- * Obtener elementos por estado (disponible, prestado, dañado, perdido)
+ * Obtener elementos por estado (disponible, prestado, dañado, mantenimiento)
  */
 router.get("/estado/:estado", authenticate, getElementosByEstado);
+
+/**
+ * GET /api/elementos/:id
+ * Obtener un elemento por ID
+ * NOTA: Esta ruta debe ir después de las rutas específicas para evitar conflictos
+ */
+router.get("/:id", authenticate, getElementoById);
 
 /**
  * POST /api/elementos

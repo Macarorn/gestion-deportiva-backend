@@ -7,12 +7,13 @@ export const createElementoSchema = z.object({
     .positive("materialId debe ser un número positivo"),
   nombre_serial: z
     .string()
-    .min(3, "nombre_serial debe tener al menos 3 caracteres")
+    .min(1, "nombre_serial es requerido")
     .max(100, "nombre_serial no puede exceder 100 caracteres"),
   estado: z
-    .enum(["disponible", "prestado", "dañado", "mantenimiento", "perdido"])
-    .default("disponible")
-    .optional(),
+    .enum(["disponible", "dañado", "mantenimiento", "prestado"], {
+      message: "Estado debe ser: disponible, dañado, mantenimiento o prestado"
+    })
+    .default("disponible"),
   observaciones: z
     .string()
     .max(500, "observaciones no puede exceder 500 caracteres")
@@ -28,10 +29,12 @@ export const updateElementoSchema = z.object({
     .optional(),
   nombre_serial: z
     .string()
-    .min(3, "nombre_serial debe tener al menos 3 caracteres")
+    .min(1, "nombre_serial es requerido")
     .max(100, "nombre_serial no puede exceder 100 caracteres")
     .optional(),
-  estado: z.enum(["disponible", "prestado", "dañado", "mantenimiento", "perdido"]).optional(),
+  estado: z.enum(["disponible", "dañado", "mantenimiento", "prestado"], {
+    message: "Estado debe ser: disponible, dañado, mantenimiento o prestado"
+  }).optional(),
   observaciones: z
     .string()
     .max(500, "observaciones no puede exceder 500 caracteres")
