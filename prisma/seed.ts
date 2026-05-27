@@ -16,6 +16,30 @@ const seedUsers = [
     tipo_usuario: TipoUsuario.Instructor,
   },
   {
+    nombre: "María",
+    apellido: "Instructor2",
+    numero_documento: "123456790",
+    correo: "instructor2@demo.com",
+    telefono: "3001234568",
+    tipo_usuario: TipoUsuario.Instructor,
+  },
+  {
+    nombre: "Pedro",
+    apellido: "Externo",
+    numero_documento: "987654322",
+    correo: "externo@demo.com",
+    telefono: "3007654322",
+    tipo_usuario: TipoUsuario.Externo,
+  },
+  {
+    nombre: "Laura",
+    apellido: "Externa",
+    numero_documento: "987654323",
+    correo: "externa@demo.com",
+    telefono: "3007654323",
+    tipo_usuario: TipoUsuario.Externo,
+  },
+  {
     nombre: "Ana",
     apellido: "Administradora",
     numero_documento: "987654321",
@@ -30,6 +54,33 @@ const seedUsers = [
     correo: "almacen@demo.com",
     telefono: "3009876543",
     tipo_usuario: TipoUsuario.Almacenista,
+  },
+  {
+    nombre: "Juan",
+    apellido: "Aprendiz",
+    numero_documento: "111111111",
+    correo: "aprendiz1@demo.com",
+    telefono: "3001111111",
+    tipo_usuario: TipoUsuario.Aprendiz,
+    ficha: "123456",
+  },
+  {
+    nombre: "María",
+    apellido: "Aprendiz",
+    numero_documento: "222222222",
+    correo: "aprendiz2@demo.com",
+    telefono: "3002222222",
+    tipo_usuario: TipoUsuario.Aprendiz,
+    ficha: "123457",
+  },
+  {
+    nombre: "Carlos",
+    apellido: "Aprendiz",
+    numero_documento: "333333333",
+    correo: "aprendiz3@demo.com",
+    telefono: "3003333333",
+    tipo_usuario: TipoUsuario.Aprendiz,
+    ficha: "123458",
   },
 ];
 
@@ -63,9 +114,12 @@ const run = async () => {
     });
   }
 
-  // Limpiar datos previos (categorías, subcategorías, materiales, elementos)
+  // Limpiar datos previos (categorías, subcategorías, materiales, elementos, préstamos)
   // Mantenemos usuarios
   console.log("Limpiando datos previos...");
+  await prisma.novedad.deleteMany();
+  await prisma.prestamoDetalle.deleteMany();
+  await prisma.prestamo.deleteMany();
   await prisma.elemento.deleteMany();
   await prisma.material.deleteMany();
   await prisma.subCategoria.deleteMany();
@@ -323,6 +377,182 @@ const run = async () => {
       },
     });
   }
+
+  console.log("Creando préstamos de prueba...");
+  
+  // Obtener usuarios
+  const instructor = await prisma.usuario.findUnique({
+    where: { correo: "instructor@demo.com" },
+  });
+  const instructor2 = await prisma.usuario.findUnique({
+    where: { correo: "instructor2@demo.com" },
+  });
+  const externo = await prisma.usuario.findUnique({
+    where: { correo: "externo@demo.com" },
+  });
+  const externa = await prisma.usuario.findUnique({
+    where: { correo: "externa@demo.com" },
+  });
+  const admin = await prisma.usuario.findUnique({
+    where: { correo: "admin@demo.com" },
+  });
+  const almacenista = await prisma.usuario.findUnique({
+    where: { correo: "almacen@demo.com" },
+  });
+
+  if (!instructor || !instructor2 || !externo || !externa || !admin || !almacenista) {
+    throw new Error("No se encontraron usuarios para crear préstamos");
+  }
+
+  // Préstamo 1: Pendiente - solicitado por instructor para sí mismo
+  const prestamo1 = await prisma.prestamo.create({
+    data: {
+      numero_prestamo: "PRE-2026-001",
+      usuarioId: instructor.id,
+      usuarioSolicitanteId: instructor.id,
+      estado: "pendiente",
+      fecha_prestamo: new Date(),
+      fecha_devolucion_esperada: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      observaciones: "Préstamo para entrenamiento de fútbol",
+      detalles: {
+        create: [
+          {
+            materialId: material1.id,
+            cantidad_solicitada: 3,
+            cantidad_entregada: 0,
+            cantidad_devuelta: 0,
+            cantidad_danada: 0,
+            cantidad_faltante: 0,
+          },
+        ],
+      },
+    },
+  });
+
+  // Préstamo 2: Activo - solicitado por externo para sí mismo
+  const prestamo2 = await prisma.prestamo.create({
+    data: {
+      numero_prestamo: "PRE-2026-002",
+      usuarioId: externo.id,
+      usuarioSolicitanteId: externo.id,
+      estado: "activo",
+      fecha_prestamo: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      fecha_devolucion_esperada: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+      observaciones: "Préstamo activo para competencia",
+      detalles: {
+        create: [
+          {
+            materialId: material2.id,
+            cantidad_solicitada: 2,
+            cantidad_entregada: 2,
+            cantidad_devuelta: 0,
+            cantidad_danada: 0,
+            cantidad_faltante: 0,
+          },
+          {
+            materialId: material7.id,
+            cantidad_solicitada: 5,
+            cantidad_entregada: 5,
+            cantidad_devuelta: 0,
+            cantidad_danada: 0,
+            cantidad_faltante: 0,
+          },
+        ],
+      },
+    },
+  });
+
+  // Actualizar cantidades prestadas de materiales
+  await prisma.material.update({
+    where: { id: material2.id },
+    data: { cantidad_prestada: 2, cantidad_disponible: 4 },
+  });
+  await prisma.material.update({
+    where: { id: material7.id },
+    data: { cantidad_prestada: 5, cantidad_disponible: 25 },
+  });
+
+  // Préstamo 3: Devuelto - solicitado por instructor2 para sí mismo
+  const prestamo3 = await prisma.prestamo.create({
+    data: {
+      numero_prestamo: "PRE-2026-003",
+      usuarioId: instructor2.id,
+      usuarioSolicitanteId: instructor2.id,
+      estado: "devuelto",
+      fecha_prestamo: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+      fecha_devolucion_esperada: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      fecha_devolucion_real: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      observaciones: "Préstamo devuelto sin novedades",
+      detalles: {
+        create: [
+          {
+            materialId: material3.id,
+            cantidad_solicitada: 4,
+            cantidad_entregada: 4,
+            cantidad_devuelta: 4,
+            cantidad_danada: 0,
+            cantidad_faltante: 0,
+          },
+        ],
+      },
+    },
+  });
+
+  // Préstamo 4: Vencido - solicitado por externa para sí misma
+  const prestamo4 = await prisma.prestamo.create({
+    data: {
+      numero_prestamo: "PRE-2026-004",
+      usuarioId: externa.id,
+      usuarioSolicitanteId: externa.id,
+      estado: "vencido",
+      fecha_prestamo: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+      fecha_devolucion_esperada: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      observaciones: "Préstamo vencido - requiere atención",
+      detalles: {
+        create: [
+          {
+            materialId: material4.id,
+            cantidad_solicitada: 5,
+            cantidad_entregada: 5,
+            cantidad_devuelta: 0,
+            cantidad_danada: 0,
+            cantidad_faltante: 0,
+          },
+        ],
+      },
+    },
+  });
+
+  // Actualizar cantidades prestadas de material4
+  await prisma.material.update({
+    where: { id: material4.id },
+    data: { cantidad_prestada: 5, cantidad_disponible: 15 },
+  });
+
+  // Préstamo 5: Cancelado - solicitado por instructor para sí mismo
+  const prestamo5 = await prisma.prestamo.create({
+    data: {
+      numero_prestamo: "PRE-2026-005",
+      usuarioId: instructor.id,
+      usuarioSolicitanteId: instructor.id,
+      estado: "cancelado",
+      fecha_prestamo: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+      fecha_devolucion_esperada: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+      observaciones: "Préstamo cancelado por falta de disponibilidad",
+      detalles: {
+        create: [
+          {
+            materialId: material5.id,
+            cantidad_solicitada: 10,
+            cantidad_entregada: 0,
+            cantidad_devuelta: 0,
+            cantidad_danada: 0,
+            cantidad_faltante: 0,
+          },
+        ],
+      },
+    },
+  });
 
   console.log("✅ Seed data creado exitosamente");
 };

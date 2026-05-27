@@ -4,6 +4,7 @@ import {
   deleteUsuario,
   getUsuarioById,
   getUsuarios,
+  getUsuariosParaPrestamos,
   updateUsuario,
 } from "../controllers/usuarios.controller";
 import { requireAuth } from "../middleware/auth.middleware";
@@ -16,7 +17,16 @@ import {
 
 const router = Router();
 
-// Todas las rutas requieren autenticación y rol de Administrador
+// Ruta especial para obtener usuarios disponibles para préstamos
+// Accesible para roles que pueden crear préstamos
+router.get(
+  "/para-prestamos",
+  requireAuth,
+  requireRole(["Administrador", "Almacenista", "Instructor", "Externo"]),
+  getUsuariosParaPrestamos
+);
+
+// Todas las rutas restantes requieren autenticación y rol de Administrador
 router.use(requireAuth, requireRole(["Administrador"]));
 
 /**

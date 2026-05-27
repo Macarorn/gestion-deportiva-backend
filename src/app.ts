@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.routes";
 import categoriasRoutes from "./routes/categorias.routes";
 import elementosRoutes from "./routes/elementos.routes";
 import materialesRoutes from "./routes/materiales.routes";
+import prestamosRoutes from "./routes/prestamos.routes";
 import subcategoriasRoutes from "./routes/subcategorias.routes";
 import usuariosRoutes from "./routes/usuarios.routes";
 
@@ -34,5 +35,8 @@ app.use("/categorias", categoriasRoutes);
 app.use("/subcategorias", subcategoriasRoutes);
 app.use("/materiales", materialesRoutes);
 app.use("/elementos", elementosRoutes);
+
+// Rutas de préstamos
+app.use("/prestamos", prestamosRoutes);
 
 export default app;

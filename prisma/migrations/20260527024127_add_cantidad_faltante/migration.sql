@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `material` ADD COLUMN `cantidad_faltante` INTEGER NOT NULL DEFAULT 0;

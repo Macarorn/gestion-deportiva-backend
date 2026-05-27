@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteSubCategoria = exports.updateSubCategoria = exports.createSubCategoria = exports.getSubCategoriasByCategoria = exports.getSubCategoriaById = exports.getAllSubCategorias = void 0;
+const zod_1 = require("zod");
 const prisma_1 = require("../lib/prisma");
 const subCategoria_schema_1 = require("../schemas/subCategoria.schema");
-const zod_1 = require("zod");
 /**
  * GET /api/subcategorias
  * Obtener todas las subcategorías con sus materiales
@@ -233,7 +233,8 @@ const updateSubCategoria = async (req, res) => {
             return;
         }
         // Si se cambia categoriaId, verificar que existe
-        if (data.categoriaId && data.categoriaId !== existingSubCategoria.categoriaId) {
+        if (data.categoriaId &&
+            data.categoriaId !== existingSubCategoria.categoriaId) {
             const newCategoria = await prisma_1.prisma.categoria.findUnique({
                 where: { id: data.categoriaId },
             });

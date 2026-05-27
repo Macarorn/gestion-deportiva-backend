@@ -7,83 +7,156 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum TipoUsuario {
+model categoria {
+  id           Int            @id @default(autoincrement())
+  nombre       String         @unique(map: "Categoria_nombre_key")
+  descripcion  String?
+  estado       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  subcategoria subcategoria[]
+}
+
+model elemento {
+  id              Int               @id @default(autoincrement())
+  materialId      Int
+  nombre_serial   String
+  estado          String            @default("disponible")
+  observaciones   String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime
+  material        material          @relation(fields: [materialId], references: [id], map: "Elemento_materialId_fkey")
+  novedad         novedad[]
+  prestamodetalle prestamodetalle[]
+
+  @@unique([materialId, nombre_serial], map: "Elemento_materialId_nombre_serial_key")
+}
+
+model material {
+  id                     Int               @id @default(autoincrement())
+  nombre                 String
+  descripcion            String?
+  subCategoriaId         Int
+  cantidad_total         Int               @default(0)
+  cantidad_disponible    Int               @default(0)
+  cantidad_prestada      Int               @default(0)
+  estado                 String            @default("activo")
+  fotografia             String?
+  observaciones          String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime
+  cantidad_danada        Int               @default(0)
+  cantidad_mantenimiento Int               @default(0)
+  requiere_serial        Boolean           @default(false)
+  cantidad_faltante      Int               @default(0)
+  elemento               elemento[]
+  subcategoria           subcategoria      @relation(fields: [subCategoriaId], references: [id], map: "Material_subCategoriaId_fkey")
+  prestamodetalle        prestamodetalle[]
+
+  @@index([subCategoriaId], map: "Material_subCategoriaId_fkey")
+}
+
+model novedad {
+  id                Int       @id @default(autoincrement())
+  prestamoId        Int
+  tipo              String
+  descripcion       String
+  cantidad_afectada Int
+  createdAt         DateTime  @default(now())
+  elementoId        Int?
+  elemento          elemento? @relation(fields: [elementoId], references: [id], map: "Novedad_elementoId_fkey")
+  prestamo          prestamo  @relation(fields: [prestamoId], references: [id], onDelete: Cascade, map: "Novedad_prestamoId_fkey")
+
+  @@index([elementoId], map: "Novedad_elementoId_idx")
+  @@index([prestamoId], map: "Novedad_prestamoId_idx")
+}
+
+model prestamo {
+  id                                             Int               @id @default(autoincrement())
+  numero_prestamo                                String            @unique(map: "Prestamo_numero_prestamo_key") @db.VarChar(20)
+  usuarioId                                      Int
+  usuarioSolicitanteId                           Int?
+  estado                                         String            @default("pendiente")
+  fecha_prestamo                                 DateTime
+  fecha_devolucion_esperada                      DateTime
+  fecha_devolucion_real                          DateTime?
+  hora_entrega                                   DateTime?
+  hora_devolucion                                DateTime?
+  observaciones                                  String?
+  createdAt                                      DateTime          @default(now())
+  updatedAt                                      DateTime
+  aprendizId                                     Int?
+  novedad                                        novedad[]
+  usuario_prestamo_aprendizIdTousuario           usuario?          @relation("prestamo_aprendizIdTousuario", fields: [aprendizId], references: [id], map: "Prestamo_aprendizId_fkey")
+  usuario_prestamo_usuarioIdTousuario            usuario           @relation("prestamo_usuarioIdTousuario", fields: [usuarioId], references: [id], map: "Prestamo_usuarioId_fkey")
+  usuario_prestamo_usuarioSolicitanteIdTousuario usuario?          @relation("prestamo_usuarioSolicitanteIdTousuario", fields: [usuarioSolicitanteId], references: [id], map: "Prestamo_usuarioSolicitanteId_fkey")
+  prestamodetalle                                prestamodetalle[]
+
+  @@index([aprendizId], map: "Prestamo_aprendizId_idx")
+  @@index([estado], map: "Prestamo_estado_idx")
+  @@index([usuarioId], map: "Prestamo_usuarioId_idx")
+  @@index([usuarioSolicitanteId], map: "Prestamo_usuarioSolicitanteId_idx")
+}
+
+model prestamodetalle {
+  id                  Int       @id @default(autoincrement())
+  prestamoId          Int
+  materialId          Int
+  elementoId          Int?
+  cantidad_solicitada Int
+  cantidad_entregada  Int       @default(0)
+  cantidad_devuelta   Int       @default(0)
+  cantidad_danada     Int       @default(0)
+  cantidad_faltante   Int       @default(0)
+  observaciones       String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime
+  elemento            elemento? @relation(fields: [elementoId], references: [id], map: "PrestamoDetalle_elementoId_fkey")
+  material            material  @relation(fields: [materialId], references: [id], map: "PrestamoDetalle_materialId_fkey")
+  prestamo            prestamo  @relation(fields: [prestamoId], references: [id], onDelete: Cascade, map: "PrestamoDetalle_prestamoId_fkey")
+
+  @@index([elementoId], map: "PrestamoDetalle_elementoId_idx")
+  @@index([materialId], map: "PrestamoDetalle_materialId_idx")
+  @@index([prestamoId], map: "PrestamoDetalle_prestamoId_idx")
+}
+
+model subcategoria {
+  id          Int        @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  categoriaId Int
+  estado      Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime
+  material    material[]
+  categoria   categoria  @relation(fields: [categoriaId], references: [id], map: "SubCategoria_categoriaId_fkey")
+
+  @@unique([categoriaId, nombre], map: "SubCategoria_categoriaId_nombre_key")
+}
+
+model usuario {
+  id                                              Int                  @id @default(autoincrement())
+  nombre                                          String
+  correo                                          String               @unique(map: "Usuario_correo_key")
+  contrasena                                      String
+  tipo_usuario                                    usuario_tipo_usuario
+  estado                                          Boolean              @default(true)
+  createdAt                                       DateTime             @default(now())
+  updatedAt                                       DateTime
+  apellido                                        String
+  ficha                                           String?
+  numero_documento                                String               @unique(map: "Usuario_numero_documento_key")
+  observaciones                                   String?
+  telefono                                        String
+  prestamo_prestamo_aprendizIdTousuario           prestamo[]           @relation("prestamo_aprendizIdTousuario")
+  prestamo_prestamo_usuarioIdTousuario            prestamo[]           @relation("prestamo_usuarioIdTousuario")
+  prestamo_prestamo_usuarioSolicitanteIdTousuario prestamo[]           @relation("prestamo_usuarioSolicitanteIdTousuario")
+}
+
+enum usuario_tipo_usuario {
   Instructor
   Administrador
   Almacenista
   Aprendiz
   Externo
-}
-
-model Usuario {
-  id               Int         @id @default(autoincrement())
-  nombre           String
-  apellido         String
-  numero_documento String      @unique
-  correo           String      @unique
-  contrasena       String
-  telefono         String
-  tipo_usuario     TipoUsuario
-  estado           Boolean     @default(true)
-  ficha            String?
-  observaciones    String?
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-}
-
-model Categoria {
-  id            Int            @id @default(autoincrement())
-  nombre        String         @unique
-  descripcion   String?
-  estado        Boolean        @default(true)
-  subCategorias SubCategoria[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-}
-
-model SubCategoria {
-  id          Int        @id @default(autoincrement())
-  nombre      String
-  descripcion String?
-  categoria   Categoria  @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
-  categoriaId Int
-  estado      Boolean    @default(true)
-  materiales  Material[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  @@unique([categoriaId, nombre])
-}
-
-model Material {
-  id                     Int          @id @default(autoincrement())
-  nombre                 String
-  descripcion            String?
-  subCategoria           SubCategoria @relation(fields: [subCategoriaId], references: [id], onDelete: Restrict)
-  subCategoriaId         Int
-  cantidad_total         Int          @default(0)
-  cantidad_disponible    Int          @default(0)
-  cantidad_prestada      Int          @default(0)
-  cantidad_danada        Int          @default(0)
-  cantidad_mantenimiento Int          @default(0)
-  requiere_serial        Boolean      @default(false)
-  estado                 String       @default("activo")
-  fotografia             String?
-  observaciones          String?
-  elementos              Elemento[]
-  createdAt              DateTime     @default(now())
-  updatedAt              DateTime     @updatedAt
-}
-
-model Elemento {
-  id            Int      @id @default(autoincrement())
-  material      Material @relation(fields: [materialId], references: [id], onDelete: Restrict)
-  materialId    Int
-  nombre_serial String
-  estado        String   @default("disponible")
-  observaciones String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@unique([materialId, nombre_serial])
 }

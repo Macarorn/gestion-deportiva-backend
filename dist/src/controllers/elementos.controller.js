@@ -1,9 +1,52 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteElemento = exports.updateElemento = exports.createElemento = exports.getElementosByEstado = exports.getElementosByMaterial = exports.getElementoById = exports.getAllElementos = void 0;
+const zod_1 = require("zod");
 const prisma_1 = require("../lib/prisma");
 const elemento_schema_1 = require("../schemas/elemento.schema");
-const zod_1 = require("zod");
+/**
+ * Función auxiliar para recalcular las cantidades de un material basado en sus elementos
+ * Retorna el material actualizado con sus elementos
+ */
+async function recalcularCantidadesMaterial(materialId) {
+    const elementos = await prisma_1.prisma.elemento.findMany({
+        where: { materialId },
+    });
+    console.log(`[recalcularCantidadesMaterial] Material ID: ${materialId}`);
+    console.log(`[recalcularCantidadesMaterial] Elementos:`, elementos.map(e => ({ id: e.id, nombre_serial: e.nombre_serial, estado: e.estado })));
+    const cantidad_total = elementos.length;
+    const cantidad_disponible = elementos.filter(e => e.estado === "disponible").length;
+    const cantidad_prestada = elementos.filter(e => e.estado === "prestado").length;
+    const cantidad_danada = elementos.filter(e => e.estado === "dañado").length;
+    const cantidad_mantenimiento = elementos.filter(e => e.estado === "mantenimiento").length;
+    console.log(`[recalcularCantidadesMaterial] Cantidades calculadas:`, {
+        cantidad_total,
+        cantidad_disponible,
+        cantidad_prestada,
+        cantidad_danada,
+        cantidad_mantenimiento,
+    });
+    const materialActualizado = await prisma_1.prisma.material.update({
+        where: { id: materialId },
+        data: {
+            cantidad_total,
+            cantidad_disponible,
+            cantidad_prestada,
+            cantidad_danada,
+            cantidad_mantenimiento,
+        },
+        include: {
+            elementos: true,
+            subCategoria: {
+                include: {
+                    categoria: true,
+                },
+            },
+        },
+    });
+    console.log(`[recalcularCantidadesMaterial] Material actualizado`);
+    return materialActualizado;
+}
 /**
  * GET /api/elementos
  * Obtener todos los elementos
@@ -48,7 +91,7 @@ exports.getAllElementos = getAllElementos;
  */
 const getElementoById = async (req, res) => {
     try {
-        const { id } = elemento_schema_1.getElementoSchema.parse(req.params);
+        const { id } = elemento_schema_1.getElementoSchema.parse({ id: parseInt(String(req.params.id)) });
         const elemento = await prisma_1.prisma.elemento.findUnique({
             where: { id },
             include: {
@@ -197,23 +240,15 @@ const createElemento = async (req, res) => {
             });
             return;
         }
-        const elemento = await prisma_1.prisma.elemento.create({
+        // Crear elemento
+        await prisma_1.prisma.elemento.create({
             data,
-            include: {
-                material: {
-                    include: {
-                        subCategoria: {
-                            include: {
-                                categoria: true,
-                            },
-                        },
-                    },
-                },
-            },
         });
+        // Recalcular cantidades del material padre y obtener material actualizado
+        const materialActualizado = await recalcularCantidadesMaterial(data.materialId);
         res.status(201).json({
             success: true,
-            data: elemento,
+            data: materialActualizado,
             message: "Elemento creado exitosamente",
         });
     }
@@ -248,7 +283,7 @@ exports.createElemento = createElemento;
  */
 const updateElemento = async (req, res) => {
     try {
-        const { id } = elemento_schema_1.getElementoSchema.parse(req.params);
+        const { id } = elemento_schema_1.getElementoSchema.parse({ id: parseInt(String(req.params.id)) });
         const data = elemento_schema_1.updateElementoSchema.parse(req.body);
         // Verificar que existe
         const existingElemento = await prisma_1.prisma.elemento.findUnique({
@@ -274,24 +309,20 @@ const updateElemento = async (req, res) => {
                 return;
             }
         }
-        const elemento = await prisma_1.prisma.elemento.update({
+        // Actualizar elemento
+        await prisma_1.prisma.elemento.update({
             where: { id },
             data,
-            include: {
-                material: {
-                    include: {
-                        subCategoria: {
-                            include: {
-                                categoria: true,
-                            },
-                        },
-                    },
-                },
-            },
         });
+        // Recalcular cantidades del material original
+        const materialActualizado = await recalcularCantidadesMaterial(existingElemento.materialId);
+        // Si se cambió el materialId, recalcular también el nuevo material
+        if (data.materialId && data.materialId !== existingElemento.materialId) {
+            await recalcularCantidadesMaterial(data.materialId);
+        }
         res.status(200).json({
             success: true,
-            data: elemento,
+            data: materialActualizado,
             message: "Elemento actualizado exitosamente",
         });
     }
@@ -326,7 +357,7 @@ exports.updateElemento = updateElemento;
  */
 const deleteElemento = async (req, res) => {
     try {
-        const { id } = elemento_schema_1.getElementoSchema.parse(req.params);
+        const { id } = elemento_schema_1.getElementoSchema.parse({ id: parseInt(String(req.params.id)) });
         // Verificar que existe
         const existingElemento = await prisma_1.prisma.elemento.findUnique({
             where: { id },
@@ -350,8 +381,11 @@ const deleteElemento = async (req, res) => {
         await prisma_1.prisma.elemento.delete({
             where: { id },
         });
+        // Recalcular cantidades del material padre y obtener material actualizado
+        const materialActualizado = await recalcularCantidadesMaterial(existingElemento.materialId);
         res.status(200).json({
             success: true,
+            data: materialActualizado,
             message: "Elemento eliminado exitosamente",
         });
     }

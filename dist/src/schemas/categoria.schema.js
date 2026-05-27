@@ -7,7 +7,10 @@ exports.createCategoriaSchema = zod_1.z.object({
         .string()
         .min(3, "Nombre debe tener al menos 3 caracteres")
         .max(100, "Nombre no puede exceder 100 caracteres"),
-    descripcion: zod_1.z.string().max(500, "Descripción no puede exceder 500 caracteres").optional(),
+    descripcion: zod_1.z
+        .string()
+        .max(500, "Descripción no puede exceder 500 caracteres")
+        .optional(),
     estado: zod_1.z.boolean().default(true).optional(),
 });
 exports.updateCategoriaSchema = zod_1.z.object({
@@ -16,7 +19,10 @@ exports.updateCategoriaSchema = zod_1.z.object({
         .min(3, "Nombre debe tener al menos 3 caracteres")
         .max(100, "Nombre no puede exceder 100 caracteres")
         .optional(),
-    descripcion: zod_1.z.string().max(500, "Descripción no puede exceder 500 caracteres").optional(),
+    descripcion: zod_1.z
+        .string()
+        .max(500, "Descripción no puede exceder 500 caracteres")
+        .optional(),
     estado: zod_1.z.boolean().optional(),
 });
 exports.getCategoriaSchema = zod_1.z.object({

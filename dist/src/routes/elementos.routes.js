@@ -11,20 +11,21 @@ const router = (0, express_1.Router)();
  */
 router.get("/", auth_middleware_1.authenticate, elementos_controller_1.getAllElementos);
 /**
- * GET /api/elementos/:id
- * Obtener un elemento por ID
- */
-router.get("/:id", auth_middleware_1.authenticate, elementos_controller_1.getElementoById);
-/**
- * GET /api/materiales/:materialId/elementos
+ * GET /api/elementos/material/:materialId
  * Obtener elementos de un material específico
  */
 router.get("/material/:materialId", auth_middleware_1.authenticate, elementos_controller_1.getElementosByMaterial);
 /**
  * GET /api/elementos/estado/:estado
- * Obtener elementos por estado (disponible, prestado, dañado, perdido)
+ * Obtener elementos por estado (disponible, prestado, dañado, mantenimiento)
  */
 router.get("/estado/:estado", auth_middleware_1.authenticate, elementos_controller_1.getElementosByEstado);
+/**
+ * GET /api/elementos/:id
+ * Obtener un elemento por ID
+ * NOTA: Esta ruta debe ir después de las rutas específicas para evitar conflictos
+ */
+router.get("/:id", auth_middleware_1.authenticate, elementos_controller_1.getElementoById);
 /**
  * POST /api/elementos
  * Crear un nuevo elemento

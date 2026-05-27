@@ -11,15 +11,39 @@ const seedUsers = [
         apellido: "Instructor",
         numero_documento: "123456789",
         correo: "instructor@demo.com",
-        telefono: "+573001234567",
+        telefono: "3001234567",
         tipo_usuario: client_1.TipoUsuario.Instructor,
+    },
+    {
+        nombre: "María",
+        apellido: "Instructor2",
+        numero_documento: "123456790",
+        correo: "instructor2@demo.com",
+        telefono: "3001234568",
+        tipo_usuario: client_1.TipoUsuario.Instructor,
+    },
+    {
+        nombre: "Pedro",
+        apellido: "Externo",
+        numero_documento: "987654322",
+        correo: "externo@demo.com",
+        telefono: "3007654322",
+        tipo_usuario: client_1.TipoUsuario.Externo,
+    },
+    {
+        nombre: "Laura",
+        apellido: "Externa",
+        numero_documento: "987654323",
+        correo: "externa@demo.com",
+        telefono: "3007654323",
+        tipo_usuario: client_1.TipoUsuario.Externo,
     },
     {
         nombre: "Ana",
         apellido: "Administradora",
         numero_documento: "987654321",
         correo: "admin@demo.com",
-        telefono: "+573007654321",
+        telefono: "3007654321",
         tipo_usuario: client_1.TipoUsuario.Administrador,
     },
     {
@@ -27,7 +51,7 @@ const seedUsers = [
         apellido: "Almacenista",
         numero_documento: "456123789",
         correo: "almacen@demo.com",
-        telefono: "+573009876543",
+        telefono: "3009876543",
         tipo_usuario: client_1.TipoUsuario.Almacenista,
     },
 ];
@@ -59,9 +83,12 @@ const run = async () => {
             },
         });
     }
-    // Limpiar datos previos (categorías, subcategorías, materiales, elementos)
+    // Limpiar datos previos (categorías, subcategorías, materiales, elementos, préstamos)
     // Mantenemos usuarios
     console.log("Limpiando datos previos...");
+    await prisma.novedad.deleteMany();
+    await prisma.prestamoDetalle.deleteMany();
+    await prisma.prestamo.deleteMany();
     await prisma.elemento.deleteMany();
     await prisma.material.deleteMany();
     await prisma.subCategoria.deleteMany();
@@ -159,8 +186,9 @@ const run = async () => {
             descripcion: "Balón profesional para fútbol",
             subCategoriaId: sub1.id,
             cantidad_total: 10,
-            cantidad_disponible: 8,
-            cantidad_prestada: 2,
+            cantidad_disponible: 10,
+            cantidad_prestada: 0,
+            requiere_serial: true,
             estado: "activo",
             fotografia: "balon_futbol.jpg",
             observaciones: "Stock actualizado",
@@ -172,8 +200,9 @@ const run = async () => {
             descripcion: "Balón oficial de baloncesto",
             subCategoriaId: sub2.id,
             cantidad_total: 6,
-            cantidad_disponible: 4,
-            cantidad_prestada: 2,
+            cantidad_disponible: 6,
+            cantidad_prestada: 0,
+            requiere_serial: false,
             estado: "activo",
             fotografia: "balon_basket.jpg",
             observaciones: null,
@@ -185,8 +214,9 @@ const run = async () => {
             descripcion: "Balón oficial de voleibol",
             subCategoriaId: sub3.id,
             cantidad_total: 8,
-            cantidad_disponible: 7,
-            cantidad_prestada: 1,
+            cantidad_disponible: 8,
+            cantidad_prestada: 0,
+            requiere_serial: false,
             estado: "activo",
             fotografia: "balon_voleibol.jpg",
             observaciones: null,
@@ -198,8 +228,9 @@ const run = async () => {
             descripcion: "Peto de entrenamiento color rojo",
             subCategoriaId: sub4.id,
             cantidad_total: 20,
-            cantidad_disponible: 15,
-            cantidad_prestada: 5,
+            cantidad_disponible: 20,
+            cantidad_prestada: 0,
+            requiere_serial: true,
             estado: "activo",
             fotografia: "peto_rojo.jpg",
             observaciones: null,
@@ -211,8 +242,9 @@ const run = async () => {
             descripcion: "Peto de entrenamiento color azul",
             subCategoriaId: sub4.id,
             cantidad_total: 20,
-            cantidad_disponible: 18,
-            cantidad_prestada: 2,
+            cantidad_disponible: 20,
+            cantidad_prestada: 0,
+            requiere_serial: false,
             estado: "activo",
             fotografia: "peto_azul.jpg",
             observaciones: null,
@@ -224,8 +256,9 @@ const run = async () => {
             descripcion: "Peto de competencia color amarillo",
             subCategoriaId: sub5.id,
             cantidad_total: 15,
-            cantidad_disponible: 14,
-            cantidad_prestada: 1,
+            cantidad_disponible: 15,
+            cantidad_prestada: 0,
+            requiere_serial: false,
             estado: "activo",
             fotografia: "peto_amarillo.jpg",
             observaciones: null,
@@ -237,8 +270,9 @@ const run = async () => {
             descripcion: "Cono de señalización estándar",
             subCategoriaId: sub6.id,
             cantidad_total: 30,
-            cantidad_disponible: 25,
-            cantidad_prestada: 5,
+            cantidad_disponible: 30,
+            cantidad_prestada: 0,
+            requiere_serial: false,
             estado: "activo",
             fotografia: "cono_naranja.jpg",
             observaciones: "Revisar stock regularmente",
@@ -250,35 +284,209 @@ const run = async () => {
             descripcion: "Red para cancha de voleibol/badminton",
             subCategoriaId: sub7.id,
             cantidad_total: 4,
-            cantidad_disponible: 3,
-            cantidad_prestada: 1,
+            cantidad_disponible: 4,
+            cantidad_prestada: 0,
+            requiere_serial: true,
             estado: "activo",
             fotografia: "red_deportiva.jpg",
             observaciones: null,
         },
     });
     console.log("Creando elementos (seriales opcionales)...");
-    // Elementos para Balón de fútbol (ejemplo de serialización)
-    await prisma.elemento.create({
+    // Elementos para Balón de fútbol (requiere_serial: true, cantidad_total: 10)
+    for (let i = 1; i <= 10; i++) {
+        await prisma.elemento.create({
+            data: {
+                materialId: material1.id,
+                nombre_serial: `Balón Fútbol #${i.toString().padStart(3, '0')}`,
+                estado: "disponible",
+            },
+        });
+    }
+    // Elementos para Peto rojo (requiere_serial: true, cantidad_total: 20)
+    for (let i = 1; i <= 20; i++) {
+        await prisma.elemento.create({
+            data: {
+                materialId: material4.id,
+                nombre_serial: `Peto Rojo #${i.toString().padStart(3, '0')}`,
+                estado: "disponible",
+            },
+        });
+    }
+    // Elementos para Red deportiva (requiere_serial: true, cantidad_total: 4)
+    for (let i = 1; i <= 4; i++) {
+        await prisma.elemento.create({
+            data: {
+                materialId: material8.id,
+                nombre_serial: `Red Deportiva #${i.toString().padStart(3, '0')}`,
+                estado: "disponible",
+            },
+        });
+    }
+    console.log("Creando préstamos de prueba...");
+    // Obtener usuarios
+    const instructor = await prisma.usuario.findUnique({
+        where: { correo: "instructor@demo.com" },
+    });
+    const instructor2 = await prisma.usuario.findUnique({
+        where: { correo: "instructor2@demo.com" },
+    });
+    const externo = await prisma.usuario.findUnique({
+        where: { correo: "externo@demo.com" },
+    });
+    const externa = await prisma.usuario.findUnique({
+        where: { correo: "externa@demo.com" },
+    });
+    const admin = await prisma.usuario.findUnique({
+        where: { correo: "admin@demo.com" },
+    });
+    const almacenista = await prisma.usuario.findUnique({
+        where: { correo: "almacen@demo.com" },
+    });
+    if (!instructor || !instructor2 || !externo || !externa || !admin || !almacenista) {
+        throw new Error("No se encontraron usuarios para crear préstamos");
+    }
+    // Préstamo 1: Pendiente - solicitado por instructor para sí mismo
+    const prestamo1 = await prisma.prestamo.create({
         data: {
-            materialId: material1.id,
-            nombre_serial: "Balón Fútbol #001",
-            estado: "disponible",
+            numero_prestamo: "PRE-2026-001",
+            usuarioId: instructor.id,
+            usuarioSolicitanteId: instructor.id,
+            estado: "pendiente",
+            fecha_prestamo: new Date(),
+            fecha_devolucion_esperada: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            observaciones: "Préstamo para entrenamiento de fútbol",
+            detalles: {
+                create: [
+                    {
+                        materialId: material1.id,
+                        cantidad_solicitada: 3,
+                        cantidad_entregada: 0,
+                        cantidad_devuelta: 0,
+                        cantidad_danada: 0,
+                        cantidad_faltante: 0,
+                    },
+                ],
+            },
         },
     });
-    await prisma.elemento.create({
+    // Préstamo 2: Activo - solicitado por externo para sí mismo
+    const prestamo2 = await prisma.prestamo.create({
         data: {
-            materialId: material1.id,
-            nombre_serial: "Balón Fútbol #002",
-            estado: "prestado",
+            numero_prestamo: "PRE-2026-002",
+            usuarioId: externo.id,
+            usuarioSolicitanteId: externo.id,
+            estado: "activo",
+            fecha_prestamo: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+            fecha_devolucion_esperada: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+            observaciones: "Préstamo activo para competencia",
+            detalles: {
+                create: [
+                    {
+                        materialId: material2.id,
+                        cantidad_solicitada: 2,
+                        cantidad_entregada: 2,
+                        cantidad_devuelta: 0,
+                        cantidad_danada: 0,
+                        cantidad_faltante: 0,
+                    },
+                    {
+                        materialId: material7.id,
+                        cantidad_solicitada: 5,
+                        cantidad_entregada: 5,
+                        cantidad_devuelta: 0,
+                        cantidad_danada: 0,
+                        cantidad_faltante: 0,
+                    },
+                ],
+            },
         },
     });
-    // Elementos para Peto rojo
-    await prisma.elemento.create({
+    // Actualizar cantidades prestadas de materiales
+    await prisma.material.update({
+        where: { id: material2.id },
+        data: { cantidad_prestada: 2, cantidad_disponible: 4 },
+    });
+    await prisma.material.update({
+        where: { id: material7.id },
+        data: { cantidad_prestada: 5, cantidad_disponible: 25 },
+    });
+    // Préstamo 3: Devuelto - solicitado por instructor2 para sí mismo
+    const prestamo3 = await prisma.prestamo.create({
         data: {
-            materialId: material4.id,
-            nombre_serial: "Peto Rojo #001",
-            estado: "prestado",
+            numero_prestamo: "PRE-2026-003",
+            usuarioId: instructor2.id,
+            usuarioSolicitanteId: instructor2.id,
+            estado: "devuelto",
+            fecha_prestamo: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+            fecha_devolucion_esperada: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+            fecha_devolucion_real: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+            observaciones: "Préstamo devuelto sin novedades",
+            detalles: {
+                create: [
+                    {
+                        materialId: material3.id,
+                        cantidad_solicitada: 4,
+                        cantidad_entregada: 4,
+                        cantidad_devuelta: 4,
+                        cantidad_danada: 0,
+                        cantidad_faltante: 0,
+                    },
+                ],
+            },
+        },
+    });
+    // Préstamo 4: Vencido - solicitado por externa para sí misma
+    const prestamo4 = await prisma.prestamo.create({
+        data: {
+            numero_prestamo: "PRE-2026-004",
+            usuarioId: externa.id,
+            usuarioSolicitanteId: externa.id,
+            estado: "vencido",
+            fecha_prestamo: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+            fecha_devolucion_esperada: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+            observaciones: "Préstamo vencido - requiere atención",
+            detalles: {
+                create: [
+                    {
+                        materialId: material4.id,
+                        cantidad_solicitada: 5,
+                        cantidad_entregada: 5,
+                        cantidad_devuelta: 0,
+                        cantidad_danada: 0,
+                        cantidad_faltante: 0,
+                    },
+                ],
+            },
+        },
+    });
+    // Actualizar cantidades prestadas de material4
+    await prisma.material.update({
+        where: { id: material4.id },
+        data: { cantidad_prestada: 5, cantidad_disponible: 15 },
+    });
+    // Préstamo 5: Cancelado - solicitado por instructor para sí mismo
+    const prestamo5 = await prisma.prestamo.create({
+        data: {
+            numero_prestamo: "PRE-2026-005",
+            usuarioId: instructor.id,
+            usuarioSolicitanteId: instructor.id,
+            estado: "cancelado",
+            fecha_prestamo: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+            fecha_devolucion_esperada: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+            observaciones: "Préstamo cancelado por falta de disponibilidad",
+            detalles: {
+                create: [
+                    {
+                        materialId: material5.id,
+                        cantidad_solicitada: 10,
+                        cantidad_entregada: 0,
+                        cantidad_devuelta: 0,
+                        cantidad_danada: 0,
+                        cantidad_faltante: 0,
+                    },
+                ],
+            },
         },
     });
     console.log("✅ Seed data creado exitosamente");

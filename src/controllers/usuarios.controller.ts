@@ -154,6 +154,99 @@ export const getUsuarios = async (req: Request, res: Response) => {
 };
 
 /**
+ * Obtener usuarios disponibles para préstamos (Instructor, Externo, Aprendiz)
+ * Accesible para roles que pueden crear préstamos
+ */
+export const getUsuariosParaPrestamos = async (req: Request, res: Response) => {
+  try {
+    const {
+      busqueda = "",
+      rol,
+      estado,
+      pagina = "1",
+      limit = "1000",
+    } = req.query;
+
+    const paginaNum = Math.max(1, parseInt(pagina as string) || 1);
+    const limitNum = Math.min(
+      1000,
+      Math.max(1, parseInt(limit as string) || 10),
+    );
+    const skip = (paginaNum - 1) * limitNum;
+
+    // Construir where clause - solo usuarios que pueden ser destinatarios de préstamos
+    const where: any = {
+      tipo_usuario: {
+        in: ["Instructor", "Externo", "Aprendiz"],
+      },
+    };
+
+    // Búsqueda por nombre, apellido, email o documento
+    if (busqueda) {
+      where.OR = [
+        { nombre: { contains: busqueda as string } },
+        { apellido: { contains: busqueda as string } },
+        { correo: { contains: busqueda as string } },
+        { numero_documento: { contains: busqueda as string } },
+      ];
+    }
+
+    // Filtro por rol específico
+    if (rol) {
+      where.tipo_usuario = rol;
+    }
+
+    // Filtro por estado
+    if (estado !== undefined) {
+      where.estado = estado === "true" || estado === "1";
+    }
+
+    // Obtener total
+    const total = await prisma.usuario.count({ where });
+
+    // Obtener usuarios
+    const usuarios = await prisma.usuario.findMany({
+      where,
+      skip,
+      take: limitNum,
+      select: {
+        id: true,
+        nombre: true,
+        apellido: true,
+        numero_documento: true,
+        correo: true,
+        telefono: true,
+        tipo_usuario: true,
+        estado: true,
+        ficha: true,
+        observaciones: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const totalPaginas = Math.ceil(total / limitNum);
+
+    return res.status(200).json({
+      message: "Usuarios para préstamos obtenidos exitosamente",
+      data: {
+        usuarios,
+        paginacion: {
+          pagina: paginaNum,
+          limit: limitNum,
+          total,
+          totalPaginas,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error al obtener usuarios para préstamos:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+/**
  * Obtener usuario por ID
  */
 export const getUsuarioById = async (req: Request, res: Response) => {
