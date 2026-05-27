@@ -16,7 +16,7 @@ export const getAllSubCategorias = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const subcategorias = await prisma.subCategoria.findMany({
+    const subcategorias = await prisma.subcategoria.findMany({
       include: {
         categoria: {
           select: {
@@ -24,7 +24,7 @@ export const getAllSubCategorias = async (
             nombre: true,
           },
         },
-        materiales: {
+        material: {
           select: {
             id: true,
             nombre: true,
@@ -61,7 +61,7 @@ export const getSubCategoriaById = async (
   try {
     const { id } = getSubCategoriaSchema.parse(req.params);
 
-    const subcategoria = await prisma.subCategoria.findUnique({
+    const subcategoria = await prisma.subcategoria.findUnique({
       where: { id },
       include: {
         categoria: {
@@ -70,9 +70,9 @@ export const getSubCategoriaById = async (
             nombre: true,
           },
         },
-        materiales: {
+        material: {
           include: {
-            elementos: {
+            elemento: {
               select: {
                 id: true,
                 nombre_serial: true,
@@ -146,10 +146,10 @@ export const getSubCategoriasByCategoria = async (
       return;
     }
 
-    const subcategorias = await prisma.subCategoria.findMany({
+    const subcategorias = await prisma.subcategoria.findMany({
       where: { categoriaId: id },
       include: {
-        materiales: {
+        material: {
           select: {
             id: true,
             nombre: true,
@@ -199,11 +199,10 @@ export const createSubCategoria = async (
       return;
     }
 
-    const subcategoria = await prisma.subCategoria.create({
+    const subcategoria = await prisma.subcategoria.create({
       data,
       include: {
         categoria: true,
-        materiales: true,
       },
     });
 
@@ -252,7 +251,7 @@ export const updateSubCategoria = async (
     const data = updateSubCategoriaSchema.parse(req.body);
 
     // Verificar que existe
-    const existingSubCategoria = await prisma.subCategoria.findUnique({
+    const existingSubCategoria = await prisma.subcategoria.findUnique({
       where: { id },
     });
 
@@ -281,12 +280,12 @@ export const updateSubCategoria = async (
       }
     }
 
-    const subcategoria = await prisma.subCategoria.update({
+    const subcategoria = await prisma.subcategoria.update({
       where: { id },
       data,
       include: {
         categoria: true,
-        materiales: true,
+        material: true,
       },
     });
 
@@ -334,7 +333,7 @@ export const deleteSubCategoria = async (
     const { id } = getSubCategoriaSchema.parse(req.params);
 
     // Verificar que existe
-    const existingSubCategoria = await prisma.subCategoria.findUnique({
+    const existingSubCategoria = await prisma.subcategoria.findUnique({
       where: { id },
     });
 
@@ -360,7 +359,7 @@ export const deleteSubCategoria = async (
     }
 
     // Soft delete: cambiar estado a false
-    const subcategoria = await prisma.subCategoria.update({
+    const subcategoria = await prisma.subcategoria.update({
       where: { id },
       data: { estado: false },
     });

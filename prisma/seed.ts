@@ -1,4 +1,4 @@
-import { PrismaClient, TipoUsuario } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import "dotenv/config";
 import { hashPassword } from "../src/utils/password";
 
@@ -13,7 +13,8 @@ const seedUsers = [
     numero_documento: "123456789",
     correo: "instructor@demo.com",
     telefono: "3001234567",
-    tipo_usuario: TipoUsuario.Instructor,
+    tipo_usuario: "Instructor" as const,
+    ficha: null as string | null,
   },
   {
     nombre: "María",
@@ -21,7 +22,8 @@ const seedUsers = [
     numero_documento: "123456790",
     correo: "instructor2@demo.com",
     telefono: "3001234568",
-    tipo_usuario: TipoUsuario.Instructor,
+    tipo_usuario: "Instructor" as const,
+    ficha: null as string | null,
   },
   {
     nombre: "Pedro",
@@ -29,7 +31,8 @@ const seedUsers = [
     numero_documento: "987654322",
     correo: "externo@demo.com",
     telefono: "3007654322",
-    tipo_usuario: TipoUsuario.Externo,
+    tipo_usuario: "Externo" as const,
+    ficha: null as string | null,
   },
   {
     nombre: "Laura",
@@ -37,7 +40,8 @@ const seedUsers = [
     numero_documento: "987654323",
     correo: "externa@demo.com",
     telefono: "3007654323",
-    tipo_usuario: TipoUsuario.Externo,
+    tipo_usuario: "Externo" as const,
+    ficha: null as string | null,
   },
   {
     nombre: "Ana",
@@ -45,7 +49,8 @@ const seedUsers = [
     numero_documento: "987654321",
     correo: "admin@demo.com",
     telefono: "3007654321",
-    tipo_usuario: TipoUsuario.Administrador,
+    tipo_usuario: "Administrador" as const,
+    ficha: null as string | null,
   },
   {
     nombre: "Luis",
@@ -53,7 +58,8 @@ const seedUsers = [
     numero_documento: "456123789",
     correo: "almacen@demo.com",
     telefono: "3009876543",
-    tipo_usuario: TipoUsuario.Almacenista,
+    tipo_usuario: "Almacenista" as const,
+    ficha: null as string | null,
   },
   {
     nombre: "Juan",
@@ -61,7 +67,7 @@ const seedUsers = [
     numero_documento: "111111111",
     correo: "aprendiz1@demo.com",
     telefono: "3001111111",
-    tipo_usuario: TipoUsuario.Aprendiz,
+    tipo_usuario: "Aprendiz" as const,
     ficha: "123456",
   },
   {
@@ -70,7 +76,7 @@ const seedUsers = [
     numero_documento: "222222222",
     correo: "aprendiz2@demo.com",
     telefono: "3002222222",
-    tipo_usuario: TipoUsuario.Aprendiz,
+    tipo_usuario: "Aprendiz" as const,
     ficha: "123457",
   },
   {
@@ -79,7 +85,7 @@ const seedUsers = [
     numero_documento: "333333333",
     correo: "aprendiz3@demo.com",
     telefono: "3003333333",
-    tipo_usuario: TipoUsuario.Aprendiz,
+    tipo_usuario: "Aprendiz" as const,
     ficha: "123458",
   },
 ];
@@ -99,6 +105,7 @@ const run = async () => {
         telefono: user.telefono,
         contrasena: hashed,
         tipo_usuario: user.tipo_usuario,
+        ficha: user.ficha,
         estado: true,
       },
       create: {
@@ -109,6 +116,7 @@ const run = async () => {
         telefono: user.telefono,
         contrasena: hashed,
         tipo_usuario: user.tipo_usuario,
+        ficha: user.ficha,
         estado: true,
       },
     });
@@ -118,11 +126,11 @@ const run = async () => {
   // Mantenemos usuarios
   console.log("Limpiando datos previos...");
   await prisma.novedad.deleteMany();
-  await prisma.prestamoDetalle.deleteMany();
+  await prisma.prestamodetalle.deleteMany();
   await prisma.prestamo.deleteMany();
   await prisma.elemento.deleteMany();
   await prisma.material.deleteMany();
-  await prisma.subCategoria.deleteMany();
+  await prisma.subcategoria.deleteMany();
   await prisma.categoria.deleteMany();
 
   console.log("Creando categorías...");
@@ -159,7 +167,7 @@ const run = async () => {
   });
 
   console.log("Creando subcategorías...");
-  const sub1 = await prisma.subCategoria.create({
+  const sub1 = await prisma.subcategoria.create({
     data: {
       nombre: "Fútbol",
       descripcion: "Balones para fútbol",
@@ -168,7 +176,7 @@ const run = async () => {
     },
   });
 
-  const sub2 = await prisma.subCategoria.create({
+  const sub2 = await prisma.subcategoria.create({
     data: {
       nombre: "Baloncesto",
       descripcion: "Balones para baloncesto",
@@ -177,7 +185,7 @@ const run = async () => {
     },
   });
 
-  const sub3 = await prisma.subCategoria.create({
+  const sub3 = await prisma.subcategoria.create({
     data: {
       nombre: "Voleibol",
       descripcion: "Balones para voleibol",
@@ -186,7 +194,7 @@ const run = async () => {
     },
   });
 
-  const sub4 = await prisma.subCategoria.create({
+  const sub4 = await prisma.subcategoria.create({
     data: {
       nombre: "Entrenamiento",
       descripcion: "Petos de entrenamiento",
@@ -195,7 +203,7 @@ const run = async () => {
     },
   });
 
-  const sub5 = await prisma.subCategoria.create({
+  const sub5 = await prisma.subcategoria.create({
     data: {
       nombre: "Competencia",
       descripcion: "Petos de competencia",
@@ -204,7 +212,7 @@ const run = async () => {
     },
   });
 
-  const sub6 = await prisma.subCategoria.create({
+  const sub6 = await prisma.subcategoria.create({
     data: {
       nombre: "Señalización",
       descripcion: "Conos para señalización",
@@ -213,7 +221,7 @@ const run = async () => {
     },
   });
 
-  const sub7 = await prisma.subCategoria.create({
+  const sub7 = await prisma.subcategoria.create({
     data: {
       nombre: "General",
       descripcion: "Implementos varios",
@@ -414,7 +422,7 @@ const run = async () => {
       fecha_prestamo: new Date(),
       fecha_devolucion_esperada: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       observaciones: "Préstamo para entrenamiento de fútbol",
-      detalles: {
+      prestamodetalle: {
         create: [
           {
             materialId: material1.id,
@@ -439,7 +447,7 @@ const run = async () => {
       fecha_prestamo: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
       fecha_devolucion_esperada: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
       observaciones: "Préstamo activo para competencia",
-      detalles: {
+      prestamodetalle: {
         create: [
           {
             materialId: material2.id,
@@ -483,7 +491,7 @@ const run = async () => {
       fecha_devolucion_esperada: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       fecha_devolucion_real: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       observaciones: "Préstamo devuelto sin novedades",
-      detalles: {
+      prestamodetalle: {
         create: [
           {
             materialId: material3.id,
@@ -498,53 +506,22 @@ const run = async () => {
     },
   });
 
-  // Préstamo 4: Vencido - solicitado por externa para sí misma
+  // Préstamo 4: Vencido
   const prestamo4 = await prisma.prestamo.create({
     data: {
       numero_prestamo: "PRE-2026-004",
       usuarioId: externa.id,
       usuarioSolicitanteId: externa.id,
       estado: "vencido",
-      fecha_prestamo: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-      fecha_devolucion_esperada: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      observaciones: "Préstamo vencido - requiere atención",
-      detalles: {
-        create: [
-          {
-            materialId: material4.id,
-            cantidad_solicitada: 5,
-            cantidad_entregada: 5,
-            cantidad_devuelta: 0,
-            cantidad_danada: 0,
-            cantidad_faltante: 0,
-          },
-        ],
-      },
-    },
-  });
-
-  // Actualizar cantidades prestadas de material4
-  await prisma.material.update({
-    where: { id: material4.id },
-    data: { cantidad_prestada: 5, cantidad_disponible: 15 },
-  });
-
-  // Préstamo 5: Cancelado - solicitado por instructor para sí mismo
-  const prestamo5 = await prisma.prestamo.create({
-    data: {
-      numero_prestamo: "PRE-2026-005",
-      usuarioId: instructor.id,
-      usuarioSolicitanteId: instructor.id,
-      estado: "cancelado",
-      fecha_prestamo: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      fecha_devolucion_esperada: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-      observaciones: "Préstamo cancelado por falta de disponibilidad",
-      detalles: {
+      fecha_prestamo: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+      fecha_devolucion_esperada: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+      observaciones: "Préstamo que no fue devuelto a tiempo",
+      prestamodetalle: {
         create: [
           {
             materialId: material5.id,
             cantidad_solicitada: 10,
-            cantidad_entregada: 0,
+            cantidad_entregada: 10,
             cantidad_devuelta: 0,
             cantidad_danada: 0,
             cantidad_faltante: 0,
@@ -554,16 +531,19 @@ const run = async () => {
     },
   });
 
-  console.log("✅ Seed data creado exitosamente");
+  await prisma.material.update({
+    where: { id: material5.id },
+    data: { cantidad_prestada: 10, cantidad_disponible: 10 },
+  });
+
+  console.log("Database seeded successfully!");
 };
 
 run()
-  .then(async () => {
-    await prisma.$disconnect();
-    console.log("✅ Seeds completados");
-  })
-  .catch(async (error) => {
-    console.error("❌ Error al ejecutar seeds", error);
-    await prisma.$disconnect();
+  .catch((e) => {
+    console.error(e);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });

@@ -35,7 +35,7 @@ export const getAllMateriales = async (
 
     // Filtro por categoría (a través de subcategoría)
     if (categoriaId && !isNaN(Number(categoriaId))) {
-      where.subCategoria = {
+      where.subcategoria = {
         categoriaId: Number(categoriaId),
       };
     }
@@ -58,7 +58,7 @@ export const getAllMateriales = async (
       prisma.material.findMany({
         where,
         include: {
-          subCategoria: {
+          subcategoria: {
             select: {
               id: true,
               nombre: true,
@@ -70,7 +70,7 @@ export const getAllMateriales = async (
               },
             },
           },
-          elementos: {
+          elemento: {
             select: {
               id: true,
               nombre_serial: true,
@@ -116,12 +116,12 @@ export const getMaterialById = async (
     const material = await prisma.material.findUnique({
       where: { id },
       include: {
-        subCategoria: {
+        subcategoria: {
           include: {
             categoria: true,
           },
         },
-        elementos: {
+        elemento: {
           orderBy: { nombre_serial: "asc" },
         },
       },
@@ -177,11 +177,11 @@ export const getMaterialesBySubCategoria = async (
     }
 
     // Verificar que existe la subcategoría
-    const subcategoria = await prisma.subCategoria.findUnique({
+    const subcategoria_exists = await prisma.subcategoria.findUnique({
       where: { id },
     });
 
-    if (!subcategoria) {
+    if (!subcategoria_exists) {
       res.status(404).json({
         success: false,
         error: "Subcategoría no encontrada",
@@ -192,7 +192,7 @@ export const getMaterialesBySubCategoria = async (
     const materiales = await prisma.material.findMany({
       where: { subCategoriaId: id },
       include: {
-        elementos: {
+        elemento: {
           select: {
             id: true,
             nombre_serial: true,
@@ -229,7 +229,7 @@ export const createMaterial = async (
     const data = createMaterialSchema.parse(req.body);
 
     // Verificar que existe la subcategoría
-    const subcategoria = await prisma.subCategoria.findUnique({
+    const subcategoria = await prisma.subcategoria.findUnique({
       where: { id: data.subCategoriaId },
     });
 
@@ -264,7 +264,7 @@ export const createMaterial = async (
       data: {
         ...materialData,
         ...(elementos && elementos.length > 0 && {
-          elementos: {
+          elemento: {
             create: elementos.map((el) => ({
               nombre_serial: el.nombre_serial,
               estado: el.estado || "disponible",
@@ -273,12 +273,12 @@ export const createMaterial = async (
         }),
       },
       include: {
-        subCategoria: {
+        subcategoria: {
           include: {
             categoria: true,
           },
         },
-        elementos: true,
+        elemento: true,
       },
     });
 
@@ -335,7 +335,7 @@ export const updateMaterial = async (
       data.subCategoriaId &&
       data.subCategoriaId !== existingMaterial.subCategoriaId
     ) {
-      const newSubCategoria = await prisma.subCategoria.findUnique({
+      const newSubCategoria = await prisma.subcategoria.findUnique({
         where: { id: data.subCategoriaId },
       });
       if (!newSubCategoria) {
@@ -380,12 +380,12 @@ export const updateMaterial = async (
       where: { id },
       data: materialData,
       include: {
-        subCategoria: {
+        subcategoria: {
           include: {
             categoria: true,
           },
         },
-        elementos: true,
+        elemento: true,
       },
     });
 
@@ -438,12 +438,12 @@ export const updateMaterial = async (
       const materialActualizado = await prisma.material.findUnique({
         where: { id },
         include: {
-          subCategoria: {
+          subcategoria: {
             include: {
               categoria: true,
             },
           },
-          elementos: true,
+          elemento: true,
         },
       });
 

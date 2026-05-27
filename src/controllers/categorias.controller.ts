@@ -11,14 +11,14 @@ export const getAllCategorias = async (req: Request, res: Response): Promise<voi
   try {
     const categorias = await prisma.categoria.findMany({
       include: {
-        subCategorias: {
+        subcategoria: {
           select: {
             id: true,
             nombre: true,
             descripcion: true,
             estado: true,
             _count: {
-              select: { materiales: true },
+              select: { material: true },
             },
           },
         },
@@ -51,9 +51,9 @@ export const getCategoriaById = async (req: Request, res: Response): Promise<voi
     const categoria = await prisma.categoria.findUnique({
       where: { id },
       include: {
-        subCategorias: {
+        subcategoria: {
           include: {
-            materiales: {
+            material: {
               select: {
                 id: true,
                 nombre: true,
@@ -108,7 +108,7 @@ export const createCategoria = async (req: Request, res: Response): Promise<void
     const categoria = await prisma.categoria.create({
       data,
       include: {
-        subCategorias: true,
+        subcategoria: true,
       },
     });
 
@@ -170,7 +170,7 @@ export const updateCategoria = async (req: Request, res: Response): Promise<void
       where: { id },
       data,
       include: {
-        subCategorias: true,
+        subcategoria: true,
       },
     });
 

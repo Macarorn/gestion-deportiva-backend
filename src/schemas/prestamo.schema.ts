@@ -16,6 +16,32 @@ export const createPrestamoSchema = z.object({
   fecha_devolucion_esperada: z.string().datetime(),
   hora_entrega: z.string().optional(),
   observaciones: z.string().optional()
+}).refine((data) => {
+  const fechaPrestamo = new Date(data.fecha_prestamo);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const prestamoDateOnly = new Date(fechaPrestamo.getFullYear(), fechaPrestamo.getMonth(), fechaPrestamo.getDate());
+  return prestamoDateOnly >= today;
+}, {
+  message: "La fecha de préstamo no puede ser una fecha pasada",
+  path: ["fecha_prestamo"],
+}).refine((data) => {
+  const fechaPrestamo = new Date(data.fecha_prestamo);
+  const fechaDevolucion = new Date(data.fecha_devolucion_esperada);
+  return fechaDevolucion > fechaPrestamo;
+}, {
+  message: "La fecha de devolución esperada debe ser posterior a la fecha de préstamo",
+  path: ["fecha_devolucion_esperada"],
+}).refine((data) => {
+  const fechaDevolucion = new Date(data.fecha_devolucion_esperada);
+  const now = new Date();
+  // Normalizar a inicio del día para permitir préstamos que vencen hoy
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const devolucionDateOnly = new Date(fechaDevolucion.getFullYear(), fechaDevolucion.getMonth(), fechaDevolucion.getDate());
+  return devolucionDateOnly >= today;
+}, {
+  message: "La fecha de devolución esperada no puede ser una fecha pasada",
+  path: ["fecha_devolucion_esperada"],
 })
 
 export const activarPrestamoSchema = z.object({

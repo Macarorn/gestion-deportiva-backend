@@ -71,6 +71,15 @@ export const createPrestamo = async (
         return;
       }
 
+      // Validar cantidad disponible
+      if (detalle.cantidad_solicitada > material.cantidad_disponible) {
+        res.status(400).json({
+          success: false,
+          error: `La cantidad solicitada para el material "${material.nombre}" (${detalle.cantidad_solicitada}) excede la disponibilidad actual (${material.cantidad_disponible})`,
+        });
+        return;
+      }
+
       // Si tiene elementoId, verificar que existe
       if (detalle.elementoId) {
         const elemento = await prisma.elemento.findUnique({
@@ -110,7 +119,7 @@ export const createPrestamo = async (
         fecha_devolucion_esperada: new Date(data.fecha_devolucion_esperada),
         hora_entrega: data.hora_entrega ? new Date(data.hora_entrega) : null,
         observaciones: data.observaciones,
-        detalles: {
+        prestamodetalle: {
           create: data.detalles.map((detalle) => ({
             materialId: detalle.materialId,
             elementoId: detalle.elementoId,
@@ -138,11 +147,11 @@ export const createPrestamo = async (
             tipo_usuario: true,
           },
         },
-        detalles: {
+        prestamodetalle: {
           include: {
             material: {
               include: {
-                subCategoria: {
+                subcategoria: {
                   include: {
                     categoria: true,
                   },
@@ -194,7 +203,7 @@ export const activarPrestamo = async (
     const prestamo = await prisma.prestamo.findUnique({
       where: { id },
       include: {
-        detalles: {
+        prestamodetalle: {
           include: {
             material: true,
             elemento: true,
@@ -224,7 +233,7 @@ export const activarPrestamo = async (
     const elementosAsignados: Record<number, number> = {}; // Map detalle_id -> elemento_id
     
     for (const detalleData of data.detalles) {
-      const detalle = prestamo.detalles.find((d) => d.id === detalleData.detalle_id);
+      const detalle = prestamo.prestamodetalle.find((d) => d.id === detalleData.detalle_id);
       
       if (!detalle) {
         res.status(400).json({
@@ -284,12 +293,12 @@ export const activarPrestamo = async (
     const prestamoActualizado = await prisma.$transaction(async (tx) => {
       // Actualizar cada detalle
       for (const detalleData of data.detalles) {
-        const detalle = prestamo.detalles.find((d) => d.id === detalleData.detalle_id);
+        const detalle = prestamo.prestamodetalle.find((d) => d.id === detalleData.detalle_id);
         
         if (!detalle) continue;
 
         // Actualizar cantidad entregada
-        await tx.prestamoDetalle.update({
+        await tx.prestamodetalle.update({
           where: { id: detalle.id },
           data: {
             cantidad_entregada: detalleData.cantidad_entregada,
@@ -370,11 +379,11 @@ export const activarPrestamo = async (
               tipo_usuario: true,
             },
           },
-          detalles: {
+          prestamodetalle: {
             include: {
               material: {
                 include: {
-                  subCategoria: {
+                  subcategoria: {
                     include: {
                       categoria: true,
                     },
@@ -429,7 +438,7 @@ export const devolverPrestamo = async (
     const prestamo = await prisma.prestamo.findUnique({
       where: { id },
       include: {
-        detalles: {
+        prestamodetalle: {
           include: {
             material: true,
             elemento: true,
@@ -457,7 +466,7 @@ export const devolverPrestamo = async (
 
     // Validar cantidades
     for (const detalleData of data.detalles) {
-      const detalle = prestamo.detalles.find((d) => d.id === detalleData.detalle_id);
+      const detalle = prestamo.prestamodetalle.find((d) => d.id === detalleData.detalle_id);
       
       if (!detalle) {
         res.status(400).json({
@@ -507,12 +516,12 @@ export const devolverPrestamo = async (
     const prestamoActualizado = await prisma.$transaction(async (tx) => {
       // Procesar cada detalle
       for (const detalleData of data.detalles) {
-        const detalle = prestamo.detalles.find((d) => d.id === detalleData.detalle_id);
+        const detalle = prestamo.prestamodetalle.find((d) => d.id === detalleData.detalle_id);
         
         if (!detalle) continue;
 
         // Actualizar detalle
-        await tx.prestamoDetalle.update({
+        await tx.prestamodetalle.update({
           where: { id: detalle.id },
           data: {
             cantidad_devuelta: detalleData.cantidad_devuelta,
@@ -638,11 +647,11 @@ export const devolverPrestamo = async (
               tipo_usuario: true,
             },
           },
-          detalles: {
+          prestamodetalle: {
             include: {
               material: {
                 include: {
-                  subCategoria: {
+                  subcategoria: {
                     include: {
                       categoria: true,
                     },
@@ -652,7 +661,7 @@ export const devolverPrestamo = async (
               elemento: true,
             },
           },
-          novedades: true,
+          novedad: true,
         },
       });
 
@@ -700,7 +709,7 @@ export const cancelarPrestamo = async (
     const prestamo = await prisma.prestamo.findUnique({
       where: { id },
       include: {
-        detalles: {
+        prestamodetalle: {
           include: {
             material: true,
             elemento: true,
@@ -730,7 +739,7 @@ export const cancelarPrestamo = async (
     const prestamoActualizado = await prisma.$transaction(async (tx) => {
       // Si está activo, devolver al inventario
       if (prestamo.estado === "activo") {
-        for (const detalle of prestamo.detalles) {
+        for (const detalle of prestamo.prestamodetalle) {
           if (detalle.elemento) {
             // Tiene serial - cambiar estado a disponible
             await tx.elemento.update({
@@ -802,11 +811,11 @@ export const cancelarPrestamo = async (
               tipo_usuario: true,
             },
           },
-          detalles: {
+          prestamodetalle: {
             include: {
               material: {
                 include: {
-                  subCategoria: {
+                  subcategoria: {
                     include: {
                       categoria: true,
                     },
@@ -924,7 +933,7 @@ export const getPrestamos = async (
               tipo_usuario: true,
             },
           },
-          detalles: {
+          prestamodetalle: {
             include: {
               material: {
                 select: {
@@ -936,7 +945,7 @@ export const getPrestamos = async (
                   cantidad_prestada: true,
                   cantidad_danada: true,
                   cantidad_mantenimiento: true,
-                  subCategoria: {
+                  subcategoria: {
                     select: {
                       id: true,
                       nombre: true,
@@ -953,7 +962,7 @@ export const getPrestamos = async (
               elemento: true,
             },
           },
-          novedades: true,
+          novedad: true,
         },
         orderBy: { createdAt: "desc" },
         skip,
@@ -1029,7 +1038,7 @@ export const getPrestamoById = async (
             tipo_usuario: true,
           },
         },
-        detalles: {
+        prestamodetalle: {
           include: {
             material: {
               select: {
@@ -1041,7 +1050,7 @@ export const getPrestamoById = async (
                 cantidad_danada: true,
                 cantidad_mantenimiento: true,
                 requiere_serial: true,
-                subCategoria: {
+                subcategoria: {
                   include: {
                     categoria: true,
                   },
@@ -1051,7 +1060,7 @@ export const getPrestamoById = async (
             elemento: true,
           },
         },
-        novedades: true,
+        novedad: true,
       },
     });
 

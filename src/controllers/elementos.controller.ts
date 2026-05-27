@@ -43,8 +43,8 @@ async function recalcularCantidadesMaterial(materialId: number) {
       cantidad_mantenimiento,
     },
     include: {
-      elementos: true,
-      subCategoria: {
+      elemento: true,
+      subcategoria: {
         include: {
           categoria: true,
         },
@@ -71,7 +71,7 @@ export const getAllElementos = async (
           select: {
             id: true,
             nombre: true,
-            subCategoria: {
+            subcategoria: {
               select: {
                 id: true,
                 nombre: true,
@@ -113,7 +113,7 @@ export const getElementoById = async (
       include: {
         material: {
           include: {
-            subCategoria: {
+            subcategoria: {
               include: {
                 categoria: true,
               },

@@ -13,7 +13,7 @@ model categoria {
   descripcion  String?
   estado       Boolean        @default(true)
   createdAt    DateTime       @default(now())
-  updatedAt    DateTime
+  updatedAt    DateTime       @updatedAt
   subcategoria subcategoria[]
 }
 
@@ -24,7 +24,7 @@ model elemento {
   estado          String            @default("disponible")
   observaciones   String?
   createdAt       DateTime          @default(now())
-  updatedAt       DateTime
+  updatedAt       DateTime          @updatedAt
   material        material          @relation(fields: [materialId], references: [id], map: "Elemento_materialId_fkey")
   novedad         novedad[]
   prestamodetalle prestamodetalle[]
@@ -44,7 +44,7 @@ model material {
   fotografia             String?
   observaciones          String?
   createdAt              DateTime          @default(now())
-  updatedAt              DateTime
+  updatedAt              DateTime          @updatedAt
   cantidad_danada        Int               @default(0)
   cantidad_mantenimiento Int               @default(0)
   requiere_serial        Boolean           @default(false)
@@ -84,12 +84,12 @@ model prestamo {
   hora_devolucion                                DateTime?
   observaciones                                  String?
   createdAt                                      DateTime          @default(now())
-  updatedAt                                      DateTime
+  updatedAt                                      DateTime          @updatedAt
   aprendizId                                     Int?
   novedad                                        novedad[]
-  usuario_prestamo_aprendizIdTousuario           usuario?          @relation("prestamo_aprendizIdTousuario", fields: [aprendizId], references: [id], map: "Prestamo_aprendizId_fkey")
-  usuario_prestamo_usuarioIdTousuario            usuario           @relation("prestamo_usuarioIdTousuario", fields: [usuarioId], references: [id], map: "Prestamo_usuarioId_fkey")
-  usuario_prestamo_usuarioSolicitanteIdTousuario usuario?          @relation("prestamo_usuarioSolicitanteIdTousuario", fields: [usuarioSolicitanteId], references: [id], map: "Prestamo_usuarioSolicitanteId_fkey")
+  aprendiz                                       usuario?          @relation("prestamo_aprendizIdTousuario", fields: [aprendizId], references: [id], map: "Prestamo_aprendizId_fkey")
+  usuario                                        usuario           @relation("prestamo_usuarioIdTousuario", fields: [usuarioId], references: [id], map: "Prestamo_usuarioId_fkey")
+  usuario_solicitante                            usuario?          @relation("prestamo_usuarioSolicitanteIdTousuario", fields: [usuarioSolicitanteId], references: [id], map: "Prestamo_usuarioSolicitanteId_fkey")
   prestamodetalle                                prestamodetalle[]
 
   @@index([aprendizId], map: "Prestamo_aprendizId_idx")
@@ -110,7 +110,7 @@ model prestamodetalle {
   cantidad_faltante   Int       @default(0)
   observaciones       String?
   createdAt           DateTime  @default(now())
-  updatedAt           DateTime
+  updatedAt           DateTime  @updatedAt
   elemento            elemento? @relation(fields: [elementoId], references: [id], map: "PrestamoDetalle_elementoId_fkey")
   material            material  @relation(fields: [materialId], references: [id], map: "PrestamoDetalle_materialId_fkey")
   prestamo            prestamo  @relation(fields: [prestamoId], references: [id], onDelete: Cascade, map: "PrestamoDetalle_prestamoId_fkey")
@@ -127,7 +127,7 @@ model subcategoria {
   categoriaId Int
   estado      Boolean    @default(true)
   createdAt   DateTime   @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime   @updatedAt
   material    material[]
   categoria   categoria  @relation(fields: [categoriaId], references: [id], map: "SubCategoria_categoriaId_fkey")
 
@@ -142,15 +142,15 @@ model usuario {
   tipo_usuario                                    usuario_tipo_usuario
   estado                                          Boolean              @default(true)
   createdAt                                       DateTime             @default(now())
-  updatedAt                                       DateTime
+  updatedAt                                       DateTime             @updatedAt
   apellido                                        String
   ficha                                           String?
   numero_documento                                String               @unique(map: "Usuario_numero_documento_key")
   observaciones                                   String?
   telefono                                        String
-  prestamo_prestamo_aprendizIdTousuario           prestamo[]           @relation("prestamo_aprendizIdTousuario")
-  prestamo_prestamo_usuarioIdTousuario            prestamo[]           @relation("prestamo_usuarioIdTousuario")
-  prestamo_prestamo_usuarioSolicitanteIdTousuario prestamo[]           @relation("prestamo_usuarioSolicitanteIdTousuario")
+  prestamo_aprendiz                               prestamo[]           @relation("prestamo_aprendizIdTousuario")
+  prestamos                                       prestamo[]           @relation("prestamo_usuarioIdTousuario")
+  prestamos_solicitados                           prestamo[]           @relation("prestamo_usuarioSolicitanteIdTousuario")
 }
 
 enum usuario_tipo_usuario {
