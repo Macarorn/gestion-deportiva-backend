@@ -122,7 +122,7 @@ const run = async () => {
     });
   }
 
-  // Limpiar datos previos (categorías, subcategorías, materiales, elementos, préstamos)
+  // Limpiar datos previos (categorías, subcategorías, materiales, elementos, préstamos, escenarios)
   // Mantenemos usuarios
   console.log("Limpiando datos previos...");
   await prisma.novedad.deleteMany();
@@ -132,6 +132,7 @@ const run = async () => {
   await prisma.material.deleteMany();
   await prisma.subcategoria.deleteMany();
   await prisma.categoria.deleteMany();
+  await prisma.escenario.deleteMany();
 
   console.log("Creando categorías...");
   const categoria1 = await prisma.categoria.create({
@@ -534,6 +535,43 @@ const run = async () => {
   await prisma.material.update({
     where: { id: material5.id },
     data: { cantidad_prestada: 10, cantidad_disponible: 10 },
+  });
+
+  console.log("Creando escenarios de prueba...");
+  await prisma.escenario.create({
+    data: {
+      nombre: "Laboratorio",
+      descripcion: "Laboratorio de informática y tecnología",
+      ubicacion: "Edificio A - Piso 2",
+      capacidad_maxima: 30,
+      estado: true,
+      horario_disponibilidad: "Lunes a Viernes 8:00 - 18:00",
+      observaciones: "Equipado con computadoras y proyector",
+    },
+  });
+
+  await prisma.escenario.create({
+    data: {
+      nombre: "Cancha",
+      descripcion: "Cancha de fútbol profesional",
+      ubicacion: "Zona deportiva - Campo 1",
+      capacidad_maxima: 50,
+      estado: true,
+      horario_disponibilidad: "Lunes a Sábado 6:00 - 22:00",
+      observaciones: "Iluminación nocturna disponible",
+    },
+  });
+
+  await prisma.escenario.create({
+    data: {
+      nombre: "Gimnasio",
+      descripcion: "Gimnasio equipado para entrenamiento físico",
+      ubicacion: "Edificio B - Piso 1",
+      capacidad_maxima: 40,
+      estado: true,
+      horario_disponibilidad: "Lunes a Domingo 6:00 - 23:00",
+      observaciones: "Equipos de cardio y pesas disponibles",
+    },
   });
 
   console.log("Database seeded successfully!");
