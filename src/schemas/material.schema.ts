@@ -127,7 +127,7 @@ export const updateMaterialSchema = z.object({
 });
 
 export const getMaterialSchema = z.object({
-  id: z.number().int().positive("ID debe ser un número positivo"),
+  id: z.coerce.number().int().positive("ID debe ser un número positivo"),
 });
 
 export type CreateMaterialInput = z.infer<typeof createMaterialSchema>;

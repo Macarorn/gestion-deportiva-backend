@@ -168,7 +168,7 @@ model escenario {
   ubicacion              String
   capacidad_maxima       Int
   estado                 Boolean  @default(true)
-  horario_disponibilidad String?
+  horario_disponibilidad Json?
   observaciones          String?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt

@@ -94,7 +94,7 @@ export const getPrestamosSchema = z.object({
 })
 
 export const getPrestamoByIdSchema = z.object({
-  id: z.number().int().positive("ID debe ser un número positivo")
+  id: z.coerce.number().int().positive("ID debe ser un número positivo")
 })
 
 type CreatePrestamoInput = z.infer<typeof createPrestamoSchema>

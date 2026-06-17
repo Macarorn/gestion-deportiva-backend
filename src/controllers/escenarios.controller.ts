@@ -126,9 +126,16 @@ export const createEscenario = async (req: Request, res: Response): Promise<void
     });
   } catch (error) {
     if (error instanceof ZodError) {
+      const messages = error.issues.map((issue) => {
+        const path = issue.path.join(".");
+        if (path.startsWith("horario_disponibilidad.")) {
+          return issue.message.replace(/^En /, "");
+        }
+        return issue.message;
+      });
       res.status(400).json({
         success: false,
-        error: "Validación fallida",
+        error: messages,
         details: error.flatten(),
       });
       return;
@@ -176,9 +183,16 @@ export const updateEscenario = async (req: Request, res: Response): Promise<void
     });
   } catch (error) {
     if (error instanceof ZodError) {
+      const messages = error.issues.map((issue) => {
+        const path = issue.path.join(".");
+        if (path.startsWith("horario_disponibilidad.")) {
+          return issue.message.replace(/^En /, "");
+        }
+        return issue.message;
+      });
       res.status(400).json({
         success: false,
-        error: "Validación fallida",
+        error: messages,
         details: error.flatten(),
       });
       return;
@@ -233,9 +247,10 @@ export const inactivarEscenario = async (req: Request, res: Response): Promise<v
     });
   } catch (error) {
     if (error instanceof ZodError) {
+      const messages = error.issues.map((issue) => issue.message);
       res.status(400).json({
         success: false,
-        error: "Validación fallida",
+        error: messages.length > 0 ? messages : "Validación fallida",
         details: error.flatten(),
       });
       return;

@@ -26,7 +26,7 @@ export const updateCategoriaSchema = z.object({
 });
 
 export const getCategoriaSchema = z.object({
-  id: z.number().int().positive("ID debe ser un número positivo"),
+  id: z.coerce.number().int().positive("ID debe ser un número positivo"),
 });
 
 export type CreateCategoriaInput = z.infer<typeof createCategoriaSchema>;

@@ -43,7 +43,7 @@ export const updateElementoSchema = z.object({
 });
 
 export const getElementoSchema = z.object({
-  id: z.number().int().positive("ID debe ser un número positivo"),
+  id: z.coerce.number().int().positive("ID debe ser un número positivo"),
 });
 
 export type CreateElementoInput = z.infer<typeof createElementoSchema>;
