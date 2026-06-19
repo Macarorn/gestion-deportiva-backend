@@ -9,6 +9,7 @@ import elementosRoutes from "./routes/elementos.routes";
 import escenariosRoutes from "./routes/escenarios.routes";
 import materialesRoutes from "./routes/materiales.routes";
 import prestamosRoutes from "./routes/prestamos.routes";
+import reservasRoutes from "./routes/reservas.routes";
 import subcategoriasRoutes from "./routes/subcategorias.routes";
 import usuariosRoutes from "./routes/usuarios.routes";
 
@@ -42,5 +43,8 @@ app.use("/escenarios", escenariosRoutes);
 
 // Rutas de préstamos
 app.use("/prestamos", prestamosRoutes);
+
+// Rutas de reservas
+app.use("/reservas", reservasRoutes);
 
 export default app;

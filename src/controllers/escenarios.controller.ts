@@ -3,6 +3,15 @@ import { prisma } from "../lib/prisma";
 import { createEscenarioSchema, updateEscenarioSchema, getEscenarioSchema } from "../schemas/escenario.schema";
 import { ZodError } from "zod";
 
+/** Parsea horario_disponibilidad que Prisma Json devuelve como string */
+function parseHorario(h: any): any {
+  if (typeof h === "string") { try { return JSON.parse(h); } catch { return h; } }
+  return h;
+}
+function parseEscenario(e: any) {
+  return { ...e, horario_disponibilidad: parseHorario(e.horario_disponibilidad) };
+}
+
 /**
  * GET /api/escenarios
  * Obtener todos los escenarios con filtros y paginación
@@ -49,7 +58,7 @@ export const getAllEscenarios = async (req: Request, res: Response): Promise<voi
 
     res.status(200).json({
       success: true,
-      data: escenarios,
+      data: escenarios.map(parseEscenario),
       total,
       paginacion: {
         pagina: page,
@@ -88,7 +97,7 @@ export const getEscenarioById = async (req: Request, res: Response): Promise<voi
 
     res.status(200).json({
       success: true,
-      data: escenario,
+      data: parseEscenario(escenario),
     });
   } catch (error) {
     if (error instanceof ZodError) {
@@ -121,7 +130,7 @@ export const createEscenario = async (req: Request, res: Response): Promise<void
 
     res.status(201).json({
       success: true,
-      data: escenario,
+      data: parseEscenario(escenario),
       message: "Escenario creado exitosamente",
     });
   } catch (error) {
@@ -178,7 +187,7 @@ export const updateEscenario = async (req: Request, res: Response): Promise<void
 
     res.status(200).json({
       success: true,
-      data: escenario,
+      data: parseEscenario(escenario),
       message: "Escenario actualizado exitosamente",
     });
   } catch (error) {
@@ -242,7 +251,7 @@ export const inactivarEscenario = async (req: Request, res: Response): Promise<v
 
     res.status(200).json({
       success: true,
-      data: escenario,
+      data: parseEscenario(escenario),
       message: "Escenario inactivado exitosamente",
     });
   } catch (error) {

@@ -151,6 +151,7 @@ model usuario {
   prestamo_aprendiz                               prestamo[]           @relation("prestamo_aprendizIdTousuario")
   prestamos                                       prestamo[]           @relation("prestamo_usuarioIdTousuario")
   prestamos_solicitados                           prestamo[]           @relation("prestamo_usuarioSolicitanteIdTousuario")
+  reserva                                         reserva[]
 }
 
 enum usuario_tipo_usuario {
@@ -172,4 +173,27 @@ model escenario {
   observaciones          String?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
+  reserva                reserva[]
+}
+
+model reserva {
+  id                      Int       @id @default(autoincrement())
+  numero_reserva          String    @unique @db.VarChar(20)
+  escenarioId             Int
+  usuarioId               Int
+  fecha                   DateTime  @db.Date
+  hora_inicio             String    @db.VarChar(5)
+  hora_fin                String    @db.VarChar(5)
+  estado                  String    @default("pendiente") @db.VarChar(20)
+  observaciones           String?
+  observaciones_cierre    String?
+  observaciones_cancelacion String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  escenario               escenario @relation(fields: [escenarioId], references: [id])
+  usuario                 usuario   @relation(fields: [usuarioId], references: [id])
+
+  @@index([escenarioId], map: "Reserva_escenarioId_idx")
+  @@index([usuarioId], map: "Reserva_usuarioId_idx")
+  @@index([estado], map: "Reserva_estado_idx")
 }

@@ -545,7 +545,13 @@ const run = async () => {
       ubicacion: "Edificio A - Piso 2",
       capacidad_maxima: 30,
       estado: true,
-      horario_disponibilidad: "Lunes a Viernes 8:00 - 18:00",
+      horario_disponibilidad: {
+        lunes: [{ inicio: "08:00", fin: "18:00" }],
+        martes: [{ inicio: "08:00", fin: "18:00" }],
+        miercoles: [{ inicio: "08:00", fin: "18:00" }],
+        jueves: [{ inicio: "08:00", fin: "18:00" }],
+        viernes: [{ inicio: "08:00", fin: "18:00" }],
+      },
       observaciones: "Equipado con computadoras y proyector",
     },
   });
@@ -557,7 +563,14 @@ const run = async () => {
       ubicacion: "Zona deportiva - Campo 1",
       capacidad_maxima: 50,
       estado: true,
-      horario_disponibilidad: "Lunes a Sábado 6:00 - 22:00",
+      horario_disponibilidad: {
+        lunes: [{ inicio: "06:00", fin: "22:00" }],
+        martes: [{ inicio: "06:00", fin: "22:00" }],
+        miercoles: [{ inicio: "06:00", fin: "22:00" }],
+        jueves: [{ inicio: "06:00", fin: "22:00" }],
+        viernes: [{ inicio: "06:00", fin: "22:00" }],
+        sabado: [{ inicio: "06:00", fin: "22:00" }],
+      },
       observaciones: "Iluminación nocturna disponible",
     },
   });
@@ -569,7 +582,15 @@ const run = async () => {
       ubicacion: "Edificio B - Piso 1",
       capacidad_maxima: 40,
       estado: true,
-      horario_disponibilidad: "Lunes a Domingo 6:00 - 23:00",
+      horario_disponibilidad: {
+        lunes: [{ inicio: "06:00", fin: "23:00" }],
+        martes: [{ inicio: "06:00", fin: "23:00" }],
+        miercoles: [{ inicio: "06:00", fin: "23:00" }],
+        jueves: [{ inicio: "06:00", fin: "23:00" }],
+        viernes: [{ inicio: "06:00", fin: "23:00" }],
+        sabado: [{ inicio: "06:00", fin: "23:00" }],
+        domingo: [{ inicio: "06:00", fin: "23:00" }],
+      },
       observaciones: "Equipos de cardio y pesas disponibles",
     },
   });
