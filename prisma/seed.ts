@@ -128,6 +128,7 @@ const run = async () => {
   await prisma.novedad.deleteMany();
   await prisma.prestamodetalle.deleteMany();
   await prisma.prestamo.deleteMany();
+  await prisma.reserva.deleteMany();
   await prisma.elemento.deleteMany();
   await prisma.material.deleteMany();
   await prisma.subcategoria.deleteMany();
