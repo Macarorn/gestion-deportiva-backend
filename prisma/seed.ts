@@ -633,7 +633,7 @@ const run = async () => {
   });
 
   console.log("Creando escenarios de prueba...");
-  await prisma.escenario.create({
+  const escenario1 = await prisma.escenario.create({
     data: {
       nombre: "Laboratorio",
       descripcion: "Laboratorio de informática y tecnología",
@@ -651,7 +651,7 @@ const run = async () => {
     },
   });
 
-  await prisma.escenario.create({
+  const escenario2 = await prisma.escenario.create({
     data: {
       nombre: "Cancha",
       descripcion: "Cancha de fútbol profesional",
@@ -670,7 +670,7 @@ const run = async () => {
     },
   });
 
-  await prisma.escenario.create({
+  const escenario3 = await prisma.escenario.create({
     data: {
       nombre: "Gimnasio",
       descripcion: "Gimnasio equipado para entrenamiento físico",
@@ -689,6 +689,40 @@ const run = async () => {
       observaciones: "Equipos de cardio y pesas disponibles",
     },
   });
+
+  console.log("Creando reservas de prueba...");
+  const hoy = new Date();
+  const manana = new Date(hoy); manana.setDate(hoy.getDate() + 1);
+  const pasadoManana = new Date(hoy); pasadoManana.setDate(hoy.getDate() + 2);
+  const enTresDias = new Date(hoy); enTresDias.setDate(hoy.getDate() + 3);
+  const fmt = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+  const reservasData = [
+    { escenarioId: escenario1.id, usuarioId: instructor.id, fecha: fmt(manana), hora_inicio: "08:00", hora_fin: "10:00", estado: "pendiente", observaciones: "Clase de fútbol con grupo 2024" },
+    { escenarioId: escenario1.id, usuarioId: instructor.id, fecha: fmt(manana), hora_inicio: "14:00", hora_fin: "16:00", estado: "pendiente", observaciones: "Entrenamiento equipo femenino" },
+    { escenarioId: escenario2.id, usuarioId: instructor2.id, fecha: fmt(manana), hora_inicio: "10:00", hora_fin: "12:00", estado: "activa", observaciones: "Activación física grupal" },
+    { escenarioId: escenario2.id, usuarioId: instructor2.id, fecha: fmt(pasadoManana), hora_inicio: "08:00", hora_fin: "11:00", estado: "finalizada", observaciones: "Torneado interno completado", observaciones_cierre: "Evento finalizado sin novedades. Todo el equipo entregado en buen estado." },
+    { escenarioId: escenario3.id, usuarioId: instructor.id, fecha: fmt(pasadoManana), hora_inicio: "14:00", hora_fin: "16:00", estado: "cancelada", observaciones: "Cancelado por lluvia" },
+    { escenarioId: escenario1.id, usuarioId: instructor2.id, fecha: fmt(enTresDias), hora_inicio: "09:00", hora_fin: "11:00", estado: "pendiente", observaciones: "Práctica de atletismo" },
+  ];
+
+  for (let i = 0; i < reservasData.length; i++) {
+    const r = reservasData[i];
+    const [y, m, d] = r.fecha.split("-").map(Number);
+    await prisma.reserva.create({
+      data: {
+        numero_reserva: `RES-${(i+1).toString().padStart(4,"0")}`,
+        escenarioId: r.escenarioId,
+        usuarioId: r.usuarioId,
+        fecha: new Date(y, m - 1, d),
+        hora_inicio: r.hora_inicio,
+        hora_fin: r.hora_fin,
+        estado: r.estado,
+        observaciones: r.observaciones,
+        ...(r.observaciones_cierre ? { observaciones_cierre: r.observaciones_cierre } : {}),
+      },
+    });
+  }
 
   console.log("Database seeded successfully!");
 };
