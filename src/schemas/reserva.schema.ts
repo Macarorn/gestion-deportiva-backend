@@ -91,7 +91,7 @@ export const paramsReservaSchema = z.object({
 
 export const queryReservaSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().positive().max(100).default(10),
+  limit: z.coerce.number().int().positive().max(1000).default(10),
   escenarioId: z.coerce.number().int().positive().optional(),
   usuarioId: z.coerce.number().int().positive().optional(),
   estado: z.string().optional(),
