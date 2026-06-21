@@ -52,7 +52,7 @@ export const getAdminDashboard = async (_req: Request, res: Response) => {
         _sum: { cantidad_entregada: true },
       }),
       prisma.escenario.count({ where: { estado: true } }),
-      prisma.material.count({ where: { estado: true } }),
+      prisma.material.count({ where: { estado: "activo" } }),
       prisma.usuario.count({ where: { estado: true } }),
       prisma.prestamo.count({ where: { estado: "vencido" } }),
       getPrestamosPorMes(),
