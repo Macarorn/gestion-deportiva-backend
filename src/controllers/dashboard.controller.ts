@@ -3,11 +3,21 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+function hoyStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function mesInicioStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+}
+
 /** GET /dashboard/admin */
 export const getAdminDashboard = async (_req: Request, res: Response) => {
   try {
-    const now = new Date();
-    const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
+    const hoy = hoyStr();
+    const mesInicio = mesInicioStr();
 
     const [
       totalPrestamosActivos,
@@ -29,10 +39,7 @@ export const getAdminDashboard = async (_req: Request, res: Response) => {
       prisma.reserva.count({
         where: {
           estado: { in: ["pendiente", "activa"] },
-          fecha: {
-            gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-            lt: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1),
-          },
+          fecha: hoy,
         },
       }),
       prisma.prestamodetalle.aggregate({
@@ -55,7 +62,7 @@ export const getAdminDashboard = async (_req: Request, res: Response) => {
       prisma.reserva.findMany({
         where: {
           estado: { in: ["pendiente", "activa"] },
-          fecha: { gte: inicioMes },
+          fecha: { gte: mesInicio },
         },
         take: 5,
         orderBy: [{ fecha: "asc" }, { hora_inicio: "asc" }],
@@ -94,7 +101,7 @@ export const getAdminDashboard = async (_req: Request, res: Response) => {
 /** GET /dashboard/almacenista */
 export const getAlmacenistaDashboard = async (_req: Request, res: Response) => {
   try {
-    const now = new Date();
+    const hoy = hoyStr();
 
     const [
       prestamosPendientesAprobacion,
@@ -112,8 +119,8 @@ export const getAlmacenistaDashboard = async (_req: Request, res: Response) => {
         where: {
           estado: "activo",
           fecha_devolucion_esperada: {
-            lte: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1),
-            gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+            gte: hoy,
+            lte: hoy,
           },
         },
       }),
@@ -132,10 +139,7 @@ export const getAlmacenistaDashboard = async (_req: Request, res: Response) => {
       prisma.reserva.findMany({
         where: {
           estado: { in: ["pendiente", "activa"] },
-          fecha: {
-            gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-            lt: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1),
-          },
+          fecha: hoy,
         },
         orderBy: { hora_inicio: "asc" },
         include: {
@@ -178,7 +182,7 @@ export const getInstructorDashboard = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const usuarioId = user.id;
-    const now = new Date();
+    const hoy = hoyStr();
 
     const [
       misPrestamosActivos,
@@ -193,7 +197,7 @@ export const getInstructorDashboard = async (req: Request, res: Response) => {
         where: {
           usuarioId,
           estado: { in: ["pendiente", "activa"] },
-          fecha: { gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()) },
+          fecha: { gte: hoy },
         },
       }),
       prisma.prestamo.count({ where: { usuarioId, estado: "vencido" } }),
@@ -213,7 +217,7 @@ export const getInstructorDashboard = async (req: Request, res: Response) => {
         where: {
           usuarioId,
           estado: { in: ["pendiente", "activa"] },
-          fecha: { gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()) },
+          fecha: { gte: hoy },
         },
         take: 5,
         orderBy: [{ fecha: "asc" }, { hora_inicio: "asc" }],
