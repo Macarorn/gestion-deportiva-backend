@@ -5,6 +5,7 @@ import morgan from "morgan";
 
 import authRoutes from "./routes/auth.routes";
 import categoriasRoutes from "./routes/categorias.routes";
+import dashboardRoutes from "./routes/dashboard.routes";
 import elementosRoutes from "./routes/elementos.routes";
 import escenariosRoutes from "./routes/escenarios.routes";
 import materialesRoutes from "./routes/materiales.routes";
@@ -46,5 +47,8 @@ app.use("/prestamos", prestamosRoutes);
 
 // Rutas de reservas
 app.use("/reservas", reservasRoutes);
+
+// Rutas de dashboard
+app.use("/dashboard", dashboardRoutes);
 
 export default app;
