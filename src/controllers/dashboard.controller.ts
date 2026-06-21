@@ -3,21 +3,26 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+function hoyDate(): Date {
+  const d = new Date();
+  return new Date(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}T12:00:00`);
+}
+
 function hoyStr(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function mesInicioStr(): string {
+function mesInicioDate(): Date {
   const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+  return new Date(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01T12:00:00`);
 }
 
 /** GET /dashboard/admin */
 export const getAdminDashboard = async (_req: Request, res: Response) => {
   try {
-    const hoy = hoyStr();
-    const mesInicio = mesInicioStr();
+    const hoy = hoyDate();
+    const mesInicio = mesInicioDate();
 
     const [
       totalPrestamosActivos,
@@ -101,7 +106,7 @@ export const getAdminDashboard = async (_req: Request, res: Response) => {
 /** GET /dashboard/almacenista */
 export const getAlmacenistaDashboard = async (_req: Request, res: Response) => {
   try {
-    const hoy = hoyStr();
+    const hoy = hoyDate();
 
     const [
       prestamosPendientesAprobacion,
@@ -119,8 +124,8 @@ export const getAlmacenistaDashboard = async (_req: Request, res: Response) => {
         where: {
           estado: "activo",
           fecha_devolucion_esperada: {
-            gte: hoy,
-            lte: hoy,
+            gte: new Date(new Date().setHours(0, 0, 0, 0)),
+            lt: new Date(new Date().setHours(23, 59, 59, 999)),
           },
         },
       }),
@@ -182,7 +187,7 @@ export const getInstructorDashboard = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const usuarioId = user.id;
-    const hoy = hoyStr();
+    const hoy = hoyDate();
 
     const [
       misPrestamosActivos,
