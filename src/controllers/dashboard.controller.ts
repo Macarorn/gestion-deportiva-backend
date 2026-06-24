@@ -32,6 +32,7 @@ export const getAdminDashboard = async (_req: Request, res: Response) => {
       totalReservasHoy,
       reservasHoyLista,
       materialesEnPrestamo,
+      materialesEnPrestamoLista,
       prestamosVencidosHoy,
       prestamosVencidosHoyLista,
       prestamosPorVencer,
@@ -85,6 +86,14 @@ export const getAdminDashboard = async (_req: Request, res: Response) => {
       prisma.prestamodetalle.aggregate({
         where: { prestamo: { estado: "activo" } },
         _sum: { cantidad_entregada: true },
+      }),
+      prisma.prestamodetalle.findMany({
+        where: { prestamo: { estado: "activo" } },
+        include: {
+          material: { select: { nombre: true } },
+          prestamo: { select: { numero_prestamo: true, usuario: { select: { nombre: true, apellido: true } } } },
+        },
+        orderBy: { id: "desc" },
       }),
       prisma.prestamo.count({
         where: {
@@ -155,6 +164,7 @@ export const getAdminDashboard = async (_req: Request, res: Response) => {
           materialesEnPrestamo: materialesEnPrestamo._sum.cantidad_entregada || 0,
           materialesConNovedad,
         },
+        materialesEnPrestamoLista,
         prestamosActivosLista,
         prestamosPendientesLista,
         reservasHoyLista,

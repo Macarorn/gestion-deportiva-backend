@@ -456,10 +456,10 @@ export const devolverPrestamo = async (
     }
 
     // Verificar estado
-    if (prestamo.estado !== "activo") {
+    if (prestamo.estado !== "activo" && prestamo.estado !== "vencido") {
       res.status(400).json({
         success: false,
-        error: "Solo se pueden devolver préstamos en estado activo",
+        error: "Solo se pueden devolver préstamos activos o vencidos",
       });
       return;
     }
