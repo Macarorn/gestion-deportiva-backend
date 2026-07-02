@@ -8,7 +8,7 @@ const passwordRegex =
 const nameRegex = /^[a-záéíóúñA-ZÁÉÍÓÚÑ\s]+$/;
 
 // Regex para validar teléfono colombiano
-const phoneRegex = /^\d{10}$/;
+const phoneRegex = /^\d{9,}$/;
 
 export const createUsuarioSchema = z
   .object({
@@ -26,7 +26,7 @@ export const createUsuarioSchema = z
 
     numero_documento: z
       .string()
-      .regex(/^\d{6,}$/, "El documento debe contener al menos 6 dígitos"),
+      .regex(/^\d{9,}$/, "El documento debe tener al menos 9 dígitos"),
 
     correo: z.string().email("Debe ser un correo válido").toLowerCase(),
 
@@ -34,7 +34,7 @@ export const createUsuarioSchema = z
       .string()
       .regex(
         phoneRegex,
-        "El teléfono debe tener 10 dígitos",
+        "El teléfono debe tener al menos 9 dígitos",
       ),
 
     tipo_usuario: z.enum([
@@ -101,7 +101,7 @@ export const updateUsuarioSchema = z.object({
 
   numero_documento: z
     .string()
-    .regex(/^\d{6,}$/, "El documento debe contener al menos 6 dígitos")
+    .regex(/^\d{9,}$/, "El documento debe tener al menos 9 dígitos")
     .optional(),
 
   correo: z
@@ -114,7 +114,7 @@ export const updateUsuarioSchema = z.object({
     .string()
     .regex(
       phoneRegex,
-      "El teléfono debe tener 10 dígitos",
+      "El teléfono debe tener al menos 9 dígitos",
     )
     .optional(),
 
