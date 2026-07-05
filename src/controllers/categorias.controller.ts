@@ -228,12 +228,12 @@ export const deleteCategoria = async (req: Request, res: Response): Promise<void
     }
 
     // Verificar si tiene subcategorías con materiales
-    const subcategoriasWithMaterials = await prisma.subCategoria.findMany({
+    const subcategoriasWithMaterials = await prisma.subcategoria.findMany({
       where: { categoriaId: id },
-      include: { materiales: { select: { id: true } } },
+      include: { material: { select: { id: true } } },
     });
 
-    const hasAnyMaterials = subcategoriasWithMaterials.some((sub) => sub.materiales.length > 0);
+    const hasAnyMaterials = subcategoriasWithMaterials.some((sub) => sub.material.length > 0);
 
     if (hasAnyMaterials) {
       res.status(400).json({

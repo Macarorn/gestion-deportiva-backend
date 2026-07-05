@@ -1,4 +1,4 @@
-import { TipoUsuario } from "@prisma/client";
+import { usuario_tipo_usuario } from "@prisma/client";
 
 declare global {
   namespace Express {
@@ -6,7 +6,7 @@ declare global {
       user?: {
         id: number;
         correo: string;
-        tipo_usuario: TipoUsuario;
+        tipo_usuario: usuario_tipo_usuario;
       };
     }
   }
