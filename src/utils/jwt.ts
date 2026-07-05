@@ -1,10 +1,10 @@
-import { TipoUsuario } from "@prisma/client";
+import { usuario_tipo_usuario } from "@prisma/client";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
 export interface AuthTokenPayload extends JwtPayload {
   sub: string;
   correo: string;
-  tipo_usuario: TipoUsuario;
+  tipo_usuario: usuario_tipo_usuario;
 }
 
 const getJwtSecret = (): Secret => {

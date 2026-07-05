@@ -1,7 +1,7 @@
-import type { TipoUsuario } from "@prisma/client";
+import type { usuario_tipo_usuario } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 
-export const requireRole = (rolesPermitidos: TipoUsuario[]) => {
+export const requireRole = (rolesPermitidos: usuario_tipo_usuario[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ message: "Usuario no autenticado" });

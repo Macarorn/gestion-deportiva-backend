@@ -409,8 +409,14 @@ const run = async () => {
   const almacenista = await prisma.usuario.findUnique({
     where: { correo: "almacen@demo.com" },
   });
+  const aprendiz1 = await prisma.usuario.findUnique({
+    where: { correo: "aprendiz1@demo.com" },
+  });
+  const aprendiz2 = await prisma.usuario.findUnique({
+    where: { correo: "aprendiz2@demo.com" },
+  });
 
-  if (!instructor || !instructor2 || !externo || !externa || !admin || !almacenista) {
+  if (!instructor || !instructor2 || !externo || !externa || !admin || !almacenista || !aprendiz1 || !aprendiz2) {
     throw new Error("No se encontraron usuarios para crear préstamos");
   }
 
@@ -421,18 +427,18 @@ const run = async () => {
     orderBy: { id: "asc" },
   });
 
-  // Fechas basadas en 20/06/2026 - todos same-day con horas
-  // Préstamo 1: Pendiente - instructor solicita para sí mismo
+  // Fechas basadas en Julio 2026 - todos same-day con horas
+  // Préstamo 1: Pendiente - instructor solicita para sí mismo (hoy 5/Julio)
   await prisma.prestamo.create({
     data: {
       numero_prestamo: "PRE-2026-001",
       usuarioId: instructor.id,
       usuarioSolicitanteId: instructor.id,
       estado: "pendiente",
-      fecha_prestamo: new Date("2026-06-22T08:00:00"),
-      fecha_devolucion_esperada: new Date("2026-06-22T17:00:00"),
-      hora_entrega: new Date("2026-06-22T08:00:00"),
-      hora_devolucion: new Date("2026-06-22T17:00:00"),
+      fecha_prestamo: new Date("2026-07-05T08:00:00"),
+      fecha_devolucion_esperada: new Date("2026-07-05T17:00:00"),
+      hora_entrega: new Date("2026-07-05T08:00:00"),
+      hora_devolucion: new Date("2026-07-05T17:00:00"),
       observaciones: "Préstamo para entrenamiento de fútbol",
       prestamodetalle: {
         create: [
@@ -468,17 +474,17 @@ const run = async () => {
     },
   });
 
-  // Préstamo 2: Activo - instructor solicita para sí mismo
+  // Préstamo 2: Activo - instructor2 solicita para sí mismo (3/Julio)
   await prisma.prestamo.create({
     data: {
       numero_prestamo: "PRE-2026-002",
       usuarioId: instructor2.id,
       usuarioSolicitanteId: instructor2.id,
       estado: "activo",
-      fecha_prestamo: new Date("2026-06-20T09:00:00"),
-      fecha_devolucion_esperada: new Date("2026-06-20T17:00:00"),
-      hora_entrega: new Date("2026-06-20T09:00:00"),
-      hora_devolucion: new Date("2026-06-20T17:00:00"),
+      fecha_prestamo: new Date("2026-07-03T09:00:00"),
+      fecha_devolucion_esperada: new Date("2026-07-03T17:00:00"),
+      hora_entrega: new Date("2026-07-03T09:00:00"),
+      hora_devolucion: new Date("2026-07-03T17:00:00"),
       observaciones: "Préstamo activo para demostración",
       prestamodetalle: {
         create: [
@@ -513,18 +519,18 @@ const run = async () => {
     data: { cantidad_prestada: 5, cantidad_disponible: 25 },
   });
 
-  // Préstamo 3: Devuelto - instructor2 solicita para sí mismo
+  // Préstamo 3: Devuelto - instructor2 solicita para sí mismo (1/Julio)
   await prisma.prestamo.create({
     data: {
       numero_prestamo: "PRE-2026-003",
       usuarioId: instructor2.id,
       usuarioSolicitanteId: instructor2.id,
       estado: "devuelto",
-      fecha_prestamo: new Date("2026-06-15T08:00:00"),
-      fecha_devolucion_esperada: new Date("2026-06-15T17:00:00"),
-      fecha_devolucion_real: new Date("2026-06-15T15:00:00"),
-      hora_entrega: new Date("2026-06-15T08:00:00"),
-      hora_devolucion: new Date("2026-06-15T15:00:00"),
+      fecha_prestamo: new Date("2026-07-01T08:00:00"),
+      fecha_devolucion_esperada: new Date("2026-07-01T17:00:00"),
+      fecha_devolucion_real: new Date("2026-07-01T15:00:00"),
+      hora_entrega: new Date("2026-07-01T08:00:00"),
+      hora_devolucion: new Date("2026-07-01T15:00:00"),
       observaciones: "Préstamo devuelto sin novedades",
       prestamodetalle: {
         create: [
@@ -541,17 +547,17 @@ const run = async () => {
     },
   });
 
-  // Préstamo 4: Vencido - instructor solicita, admin aprueba
+  // Préstamo 4: Vencido - instructor (usuario), admin (solicitante) - 25/Junio
   await prisma.prestamo.create({
     data: {
       numero_prestamo: "PRE-2026-004",
       usuarioId: instructor.id,
       usuarioSolicitanteId: admin.id,
       estado: "vencido",
-      fecha_prestamo: new Date("2026-06-10T10:00:00"),
-      fecha_devolucion_esperada: new Date("2026-06-10T16:00:00"),
-      hora_entrega: new Date("2026-06-10T10:00:00"),
-      hora_devolucion: new Date("2026-06-10T16:00:00"),
+      fecha_prestamo: new Date("2026-06-25T10:00:00"),
+      fecha_devolucion_esperada: new Date("2026-06-25T16:00:00"),
+      hora_entrega: new Date("2026-06-25T10:00:00"),
+      hora_devolucion: new Date("2026-06-25T16:00:00"),
       observaciones: "Préstamo que no fue devuelto a tiempo",
       prestamodetalle: {
         create: [
@@ -573,17 +579,17 @@ const run = async () => {
     data: { cantidad_prestada: 10, cantidad_disponible: 10 },
   });
 
-  // Préstamo 5: Cancelado - instructor solicita, admin aprueba
+  // Préstamo 5: Cancelado - instructor (usuario), admin (solicitante) - 30/Junio
   await prisma.prestamo.create({
     data: {
       numero_prestamo: "PRE-2026-005",
       usuarioId: instructor.id,
       usuarioSolicitanteId: admin.id,
       estado: "cancelado",
-      fecha_prestamo: new Date("2026-06-21T08:00:00"),
-      fecha_devolucion_esperada: new Date("2026-06-21T17:00:00"),
-      hora_entrega: new Date("2026-06-21T08:00:00"),
-      hora_devolucion: new Date("2026-06-21T17:00:00"),
+      fecha_prestamo: new Date("2026-06-30T08:00:00"),
+      fecha_devolucion_esperada: new Date("2026-06-30T17:00:00"),
+      hora_entrega: new Date("2026-06-30T08:00:00"),
+      hora_devolucion: new Date("2026-06-30T17:00:00"),
       observaciones: "Préstamo cancelado por falta de disponibilidad",
       prestamodetalle: {
         create: [
@@ -600,17 +606,17 @@ const run = async () => {
     },
   });
 
-  // Préstamo 6: Activo - almacenista crea préstamo para externo
+  // Préstamo 6: Activo - externo (usuario), almacenista (solicitante) - 4/Julio
   await prisma.prestamo.create({
     data: {
       numero_prestamo: "PRE-2026-006",
       usuarioId: externo.id,
       usuarioSolicitanteId: almacenista.id,
       estado: "activo",
-      fecha_prestamo: new Date("2026-06-20T10:00:00"),
-      fecha_devolucion_esperada: new Date("2026-06-20T16:00:00"),
-      hora_entrega: new Date("2026-06-20T10:00:00"),
-      hora_devolucion: new Date("2026-06-20T16:00:00"),
+      fecha_prestamo: new Date("2026-07-04T10:00:00"),
+      fecha_devolucion_esperada: new Date("2026-07-04T16:00:00"),
+      hora_entrega: new Date("2026-07-04T10:00:00"),
+      hora_devolucion: new Date("2026-07-04T16:00:00"),
       observaciones: "Préstamo gestionado por almacenista para externo",
       prestamodetalle: {
         create: [
@@ -631,6 +637,49 @@ const run = async () => {
     where: { id: material4.id },
     data: { cantidad_prestada: 3, cantidad_disponible: 17 },
   });
+
+  // Préstamo 7: Activo - instructor solicita para aprendiz (hoy 5/Julio)
+  const serialBalonDisponible = await prisma.elemento.findFirst({
+    where: { materialId: material1.id, estado: "disponible" },
+  });
+  await prisma.prestamo.create({
+    data: {
+      numero_prestamo: "PRE-2026-007",
+      usuarioId: instructor.id,
+      usuarioSolicitanteId: instructor.id,
+      aprendizId: aprendiz1.id,
+      estado: "activo",
+      fecha_prestamo: new Date("2026-07-05T08:00:00"),
+      fecha_devolucion_esperada: new Date("2026-07-05T12:00:00"),
+      hora_entrega: new Date("2026-07-05T08:00:00"),
+      hora_devolucion: new Date("2026-07-05T12:00:00"),
+      observaciones: "Préstamo para aprendiz Juan - balón de fútbol",
+      prestamodetalle: {
+        create: [
+          {
+            materialId: material1.id,
+            elementoId: serialBalonDisponible?.id,
+            cantidad_solicitada: 1,
+            cantidad_entregada: 1,
+            cantidad_devuelta: 0,
+            cantidad_danada: 0,
+            cantidad_faltante: 0,
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.material.update({
+    where: { id: material1.id },
+    data: { cantidad_prestada: { increment: 1 }, cantidad_disponible: { decrement: 1 } },
+  });
+  if (serialBalonDisponible) {
+    await prisma.elemento.update({
+      where: { id: serialBalonDisponible.id },
+      data: { estado: "prestado" },
+    });
+  }
 
   console.log("Creando escenarios de prueba...");
   const escenario1 = await prisma.escenario.create({
