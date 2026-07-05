@@ -881,6 +881,10 @@ export const getPrestamos = async (
         { numero_prestamo: { contains: params.busqueda } },
         { usuario: { nombre: { contains: params.busqueda } } },
         { usuario: { apellido: { contains: params.busqueda } } },
+        { usuario_solicitante: { nombre: { contains: params.busqueda } } },
+        { usuario_solicitante: { apellido: { contains: params.busqueda } } },
+        { aprendiz: { nombre: { contains: params.busqueda } } },
+        { aprendiz: { apellido: { contains: params.busqueda } } },
       ];
     }
 
