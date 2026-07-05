@@ -86,7 +86,7 @@ export const cancelarPrestamoSchema = z.object({
 })
 
 export const getPrestamosSchema = z.object({
-  estado: z.enum(["pendiente", "activo", "devuelto", "vencido", "cancelado"]).optional(),
+  estado: z.string().optional(),
   usuarioId: z.coerce.number().int().positive().optional(),
   busqueda: z.string().optional(),
   page: z.coerce.number().int().positive().default(1),

@@ -869,7 +869,12 @@ export const getPrestamos = async (
     const where: any = {};
 
     if (params.estado) {
-      where.estado = params.estado;
+      const estados = params.estado.split(",").map((e: string) => e.trim()).filter(Boolean);
+      if (estados.length > 1) {
+        where.estado = { in: estados };
+      } else {
+        where.estado = estados[0];
+      }
     }
 
     if (params.usuarioId) {
