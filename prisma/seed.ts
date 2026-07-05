@@ -681,6 +681,33 @@ const run = async () => {
     });
   }
 
+  // Préstamo 8: Pendiente vencido - nunca se activó, fecha ya pasó (⚠ icon)
+  await prisma.prestamo.create({
+    data: {
+      numero_prestamo: "PRE-2026-008",
+      usuarioId: instructor.id,
+      usuarioSolicitanteId: instructor.id,
+      estado: "pendiente",
+      fecha_prestamo: new Date("2026-06-15T08:00:00"),
+      fecha_devolucion_esperada: new Date("2026-06-15T17:00:00"),
+      hora_entrega: new Date("2026-06-15T08:00:00"),
+      hora_devolucion: new Date("2026-06-15T17:00:00"),
+      observaciones: "Préstamo nunca activado - fecha vencida",
+      prestamodetalle: {
+        create: [
+          {
+            materialId: material3.id,
+            cantidad_solicitada: 2,
+            cantidad_entregada: 0,
+            cantidad_devuelta: 0,
+            cantidad_danada: 0,
+            cantidad_faltante: 0,
+          },
+        ],
+      },
+    },
+  });
+
   console.log("Creando escenarios de prueba...");
   const escenario1 = await prisma.escenario.create({
     data: {
