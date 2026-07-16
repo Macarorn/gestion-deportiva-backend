@@ -10,6 +10,7 @@ import {
   finalizeReservaSchema,
   cancelReservaSchema,
 } from "../schemas/reserva.schema";
+import { dateFromISO, endOfDayFromISO } from "../lib/dateUtils";
 
 const prisma = new PrismaClient();
 
@@ -150,8 +151,8 @@ export const getReservas = async (req: Request, res: Response) => {
     if (estado) where.estado = estado;
     if (fecha_desde || fecha_hasta) {
       where.fecha = {};
-      if (fecha_desde) where.fecha.gte = new Date(fecha_desde);
-      if (fecha_hasta) where.fecha.lte = new Date(fecha_hasta);
+      if (fecha_desde) where.fecha.gte = dateFromISO(fecha_desde);
+      if (fecha_hasta) where.fecha.lte = endOfDayFromISO(fecha_hasta);
     }
     if (busqueda) {
       where.OR = [
