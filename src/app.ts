@@ -8,6 +8,7 @@ import categoriasRoutes from "./routes/categorias.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import elementosRoutes from "./routes/elementos.routes";
 import escenariosRoutes from "./routes/escenarios.routes";
+import historialRoutes from "./routes/historial.routes";
 import materialesRoutes from "./routes/materiales.routes";
 import prestamosRoutes from "./routes/prestamos.routes";
 import reservasRoutes from "./routes/reservas.routes";
@@ -47,6 +48,9 @@ app.use("/prestamos", prestamosRoutes);
 
 // Rutas de reservas
 app.use("/reservas", reservasRoutes);
+
+// Rutas de historial unificado
+app.use("/historial", historialRoutes);
 
 // Rutas de dashboard
 app.use("/dashboard", dashboardRoutes);
