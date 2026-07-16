@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ZodError } from "zod";
 import { prisma } from "../lib/prisma";
 import { getHistorialSchema } from "../schemas/historial.schema";
+import { dateFromISO, endOfDayFromISO } from "../lib/dateUtils";
 
 const formatZodError = (err: ZodError) => {
   return err.issues
@@ -36,8 +37,8 @@ export const getHistorial = async (
       }
       if (params.fechaDesde || params.fechaHasta) {
         wherePrestamo.fecha_prestamo = {};
-        if (params.fechaDesde) wherePrestamo.fecha_prestamo.gte = new Date(params.fechaDesde);
-        if (params.fechaHasta) wherePrestamo.fecha_prestamo.lte = new Date(params.fechaHasta);
+        if (params.fechaDesde) wherePrestamo.fecha_prestamo.gte = dateFromISO(params.fechaDesde);
+        if (params.fechaHasta) wherePrestamo.fecha_prestamo.lte = endOfDayFromISO(params.fechaHasta);
       }
       if (params.busqueda) {
         wherePrestamo.OR = [
@@ -126,8 +127,8 @@ export const getHistorial = async (
       }
       if (params.fechaDesde || params.fechaHasta) {
         whereReserva.fecha = {};
-        if (params.fechaDesde) whereReserva.fecha.gte = new Date(params.fechaDesde);
-        if (params.fechaHasta) whereReserva.fecha.lte = new Date(params.fechaHasta);
+        if (params.fechaDesde) whereReserva.fecha.gte = dateFromISO(params.fechaDesde);
+        if (params.fechaHasta) whereReserva.fecha.lte = endOfDayFromISO(params.fechaHasta);
       }
       if (params.busqueda) {
         whereReserva.OR = [
