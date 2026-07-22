@@ -85,6 +85,8 @@ model prestamo {
   observaciones                                  String?
   createdAt                                      DateTime          @default(now())
   updatedAt                                      DateTime          @updatedAt
+  validacion_realizada                           Boolean            @default(false)
+  documento_validacion                          String?
   aprendizId                                     Int?
   novedad                                        novedad[]
   aprendiz                                       usuario?          @relation("prestamo_aprendizIdTousuario", fields: [aprendizId], references: [id], map: "Prestamo_aprendizId_fkey")
@@ -196,4 +198,11 @@ model reserva {
   @@index([escenarioId], map: "Reserva_escenarioId_idx")
   @@index([usuarioId], map: "Reserva_usuarioId_idx")
   @@index([estado], map: "Reserva_estado_idx")
+}
+
+model configuracion_validacion {
+  id               Int     @id @default(autoincrement())
+  plantilla_pdf    String?
+  contacto_nombre  String?
+  contacto_telefono String?
 }

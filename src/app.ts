@@ -8,6 +8,7 @@ import categoriasRoutes from "./routes/categorias.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import elementosRoutes from "./routes/elementos.routes";
 import escenariosRoutes from "./routes/escenarios.routes";
+import configuracionValidacionRoutes from "./routes/configuracionValidacion.routes";
 import historialRoutes from "./routes/historial.routes";
 import materialesRoutes from "./routes/materiales.routes";
 import prestamosRoutes from "./routes/prestamos.routes";
@@ -24,7 +25,7 @@ const allowedOrigins = (
 app.use(cors({ origin: allowedOrigins }));
 app.use(helmet());
 app.use(morgan("dev"));
-app.use(express.json());
+app.use(express.json({ limit: "15mb" }));
 
 app.get("/health", (_req, res) => {
   res.json({ ok: true, message: "Backend funcionando" });
@@ -51,6 +52,9 @@ app.use("/reservas", reservasRoutes);
 
 // Rutas de historial unificado
 app.use("/historial", historialRoutes);
+
+// Rutas de configuración de validación
+app.use("/configuracion-validacion", configuracionValidacionRoutes);
 
 // Rutas de dashboard
 app.use("/dashboard", dashboardRoutes);

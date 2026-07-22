@@ -50,7 +50,9 @@ export const activarPrestamoSchema = z.object({
       detalle_id: z.number().int(),
       cantidad_entregada: z.number().int().min(0)
     })
-  )
+  ),
+  validacion_realizada: z.boolean().optional().default(false),
+  documento_validacion: z.string().optional()
 })
 
 export const devolverPrestamoSchema = z.object({

@@ -203,6 +203,9 @@ export const activarPrestamo = async (
     const prestamo = await prisma.prestamo.findUnique({
       where: { id },
       include: {
+        usuario: {
+          select: { id: true, tipo_usuario: true },
+        },
         prestamodetalle: {
           include: {
             material: true,
@@ -218,6 +221,18 @@ export const activarPrestamo = async (
         error: "Préstamo no encontrado",
       });
       return;
+    }
+
+    // Validación obligatoria para préstamos de usuario Externo
+    const esExterno = prestamo.usuario.tipo_usuario === "Externo";
+    if (esExterno) {
+      if (!data.validacion_realizada || !data.documento_validacion) {
+        res.status(400).json({
+          success: false,
+          error: "Para activar un préstamo de usuario externo es obligatorio subir el documento de validación firmado",
+        });
+        return;
+      }
     }
 
     // Verificar estado
@@ -359,6 +374,10 @@ export const activarPrestamo = async (
           estado: "activo",
           fecha_prestamo: prestamo.fecha_prestamo || new Date(),
           hora_entrega: prestamo.hora_entrega || new Date(),
+          ...(esExterno && {
+            validacion_realizada: true,
+            documento_validacion: data.documento_validacion,
+          }),
         },
         include: {
           usuario: {
@@ -418,6 +437,7 @@ export const activarPrestamo = async (
     res.status(500).json({
       success: false,
       error: "Error al activar préstamo",
+      detail: error instanceof Error ? error.message : String(error),
     });
   }
 };
