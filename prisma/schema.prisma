@@ -41,7 +41,7 @@ model material {
   cantidad_disponible    Int               @default(0)
   cantidad_prestada      Int               @default(0)
   estado                 String            @default("activo")
-  fotografia             String?
+  fotografia             String? @db.LongText
   observaciones          String?
   createdAt              DateTime          @default(now())
   updatedAt              DateTime          @updatedAt
